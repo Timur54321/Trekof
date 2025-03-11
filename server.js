@@ -1,30 +1,11 @@
 const app = require("./app");
 const mongoose = require('mongoose');
-const S3 = require('aws-sdk/clients/s3');
 const fs = require('fs');
 const dotenv = require('dotenv');
 dotenv.config({path: "./config.env"});
 const RS = require("./utils/RecomSystem");
 
-const s3 = new S3({
-    credentials: {
-        accessKeyId: process.env.S3ACCESS_KEY,
-        secretAccessKey: process.env.S3SECRET_KEY
-    },
-    endpoint: "https://s3.storage.selcloud.ru",
-    s3ForcePathStyle: true,
-    region: "ru-1",
-    apiVersion: "latest"
-});
-
 const fileBuffer = fs.readFileSync('terriblestuff.jpg');
-
-const params = {
-    Bucket: 'bucket-1',
-    Key: 'terriblestuff.jpg',
-    Body: fileBuffer,
-    ContentType: 'image/jpeg',
-};
 
 // s3.upload(params, (err, data) => {
 //     if (err) {
@@ -87,5 +68,4 @@ const server = app.listen(port, () => {
     RS.calcInterestScale("Инди", localScale);
     RS.calcInterestScale("Инди", localScale);
 
-    console.log(localScale);
 });
