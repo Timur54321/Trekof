@@ -1,0 +1,188 @@
+.stat_widget {
+    width: 40rem;
+    height: 20rem;
+    background-color: #FFBD4F;
+    border-radius: 2rem;
+    padding: 2rem 3rem;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+    cursor: pointer;
+}
+
+.stat_widget:hover {
+    opacity: 1;
+}
+
+.stat_widget_name {
+    width: 80%;
+    font-size: 2rem;
+    color: #222;
+    font-weight: 700;
+}
+
+.stat_text {font-size: 1.8rem; color: #333; font-weight: 900;}
+
+.stat_track {
+    font-size: 2.4rem;
+    color: black;
+    line-height: 1.2;
+}
+
+.statistica_holder {
+    margin-top: 2.3rem;
+    width: 90rem;
+    height: 52rem;
+    border-radius: 3rem;
+    background-color: #171F21;
+}
+
+.chart-container {
+    width: 100%;
+    height: 100%;
+    padding: 2rem 2rem 6rem 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 1.4;
+}
+
+.statistics_song_list {
+    height: 30rem;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-right: 2rem;
+}
+
+.statistic_song {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.statistic_song:hover {
+    background-color: #1e272a;
+}
+
+.month_holder {
+    height: 8rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 2rem;
+    color: #111;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0.4;
+    transition: opacity 0.4s, transform 0.4s;
+}
+
+.month_holder:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.year_leftright_btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 0.1rem solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player_overlay {
+    width: 100%; 
+    height: 100vh; 
+    background-color: #041011; 
+    position: fixed; 
+    top: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.6s;
+    z-index: 10;
+}
+
+.player_action_btn {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.player_action_btn:hover, .close_btn:hover{
+    background-color: #0c272a;
+}
+
+.player_track_block {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background-color: #fff;
+    color: black;
+    padding: 1.5rem 3rem;
+    font-size: 1.4rem;
+    border-radius: 2rem;
+}
+
+.inactive_track {
+    background-color: unset;
+    color: white;
+    padding: 1rem 2rem;
+    transition: padding 0.3s;
+    cursor: pointer;
+}
+
+.inactive_track:hover {
+    padding: 1.5rem 3rem;
+}
+
+.track_progress_box {
+    position: absolute;
+    bottom: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100rem;
+    height: 6rem;
+    background-color: #0C191A;
+    border-radius: 30rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4rem;
+    font-size: 1.3rem;
+}
+
+.close_btn {
+    position: absolute;
+    top: 5rem;
+    right: 5rem;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    border: solid 0.2rem #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.close_btn img {
+    width: 30%;
+}
+

@@ -2,15 +2,11 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
     {
-        firstName: {
+        name: {
             type: String,
-            required: [true, "Пожалуйста укажите ваше имя"]
+            required: [true, "Пожалуйста укажите ник"]
         },
-        lastName: {
-            type: String,
-            required: [true, "Пожалуйста укажите фамилию"]
-        },
-        photo: String,
+        photoKey: String,
         email: {
             type: String,
             required: [true, "Пожалуйста укажите свой e-mail"],
@@ -70,7 +66,7 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-userSchema.virtuals('playlists', {
+userSchema.virtual('playlists', {
     ref: 'Playlist',
     localField: '_id',
     foreignField: 'author'

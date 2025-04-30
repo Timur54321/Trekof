@@ -1,0 +1,369 @@
+.ath_top_part {
+    width: 100%;
+    display: flex;
+    padding-top: 10rem;
+    gap: 10rem;
+    align-items: end;
+}
+
+.ath_search_box {
+    width: 100%;
+}
+
+.ath_search_title {
+    margin-bottom: 1rem;
+}
+
+.pd-left {
+    padding-left: 4rem;
+}
+
+.ath_player_box {
+    width: 100%;
+}
+
+.ath_player {
+    display: flex;
+    height: 7rem;
+    width: 100%;
+    background-color: #171F21;
+    border-radius: 2rem;
+    align-items: center;
+    gap: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.athpl_cover {
+    display: flex;
+    align-items: end;
+    height: 100%;
+}
+
+.athpl_whiteshine {
+    width: 13rem;
+    height: 13rem;
+    border-radius: 2rem;
+    margin-bottom: -2rem;
+    box-shadow: 0px 0px 1.5rem 0px rgba(255, 255, 255, 0.52);
+}
+
+.athpl_cover_holder {
+    width: 100%;
+    height: 100%;
+    border-radius: 2rem;
+    background-color: aquamarine;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.athpl_cover_holder img {
+    width: 100%;
+}
+
+.ath_music_info_box {
+    width: 100%;
+    margin-top: -0.8rem;
+}
+
+.athpl_info {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.athpl_volume_box {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.ath_volume_bar {
+    width: 6rem;
+    height: 0.3rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: rgb(152, 152, 152);
+}
+
+.ath_volume {
+    height: 100%;
+    width: 25%;
+    background-color: #e3e3e3;
+}
+
+.athPrevBtn, .athNextBtn {
+    width: 1.5rem!important;
+}
+
+.athPlayBtn {
+    width: 2rem!important;
+}
+
+.athpl_name {
+    font-size: 1.4rem;
+    margin-bottom: -0.6rem;
+}
+.athpl_author {
+    font-size: 1.2rem;
+}
+.ath_progress_bar {
+    width: 100%;
+    height: 0.4rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #969696;
+}
+
+.ath_progress {
+    height: 100%;
+    width: 25%;
+    background-color: #dfdfdf;
+}
+
+.ath_authors_title {
+    margin-bottom: 1.5rem;
+}
+
+.athpl_action_icon {
+    width: 2rem;
+}
+
+.ath_author_card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ath_author_name {
+    font-size: 1.2rem;
+}
+
+.ath_authors_list {
+    display: flex;
+    gap: 5rem;
+    align-items: center;
+}
+
+.ath_author_outline {
+    width: 10rem;
+    height: 10rem;
+    background-image: linear-gradient(to top, #67260a, #bd5927);
+    border-radius: 1.7rem;
+    padding: 0.4rem;
+    box-shadow: 0px 0px 1.5rem 0px rgba(239, 113, 63, 0.52);
+}
+
+.ath_author_holder {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+    border: solid 0.3rem rgb(13, 13, 13);
+    border-radius: 1.3rem;
+}
+
+.ath_author_holder img {
+    width: 100%;
+}
+
+.ath_musgenre_cards_box {
+    width: 100%;
+    display: flex;
+    gap: 4rem;
+    margin-top: 2rem;
+}
+
+.ath_snippet_card {
+    width: 80%;
+    height: 36rem;
+    gap: 2rem;
+    background-image: url("../data/690cdedf86de4cbbd337b96ba96155cb.jpg");
+    background-position: center;
+    background-size: 100%;
+    border-radius: 2rem;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ath_genre_songs_box {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 2rem;
+    column-gap: 4rem;
+}
+
+.smaller {
+    width: 8rem;
+    height: 8rem;
+    box-shadow: none;
+    background-image: none;
+    background-color: unset;
+}
+
+.smaller .ath_author_holder {
+    border: none;
+    border-radius: 1rem;
+}
+
+.ath_snippet_top_part {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.ath_snippet_bottom_part {
+    display: flex;
+    gap: 2rem;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.ath_snippet_name {
+    font-size: 1.6rem;
+    font-weight: 500;
+}
+
+.ath_snippet_author {
+    font-size: 1.2rem;
+    color: rgb(187, 187, 187);
+}
+
+.ath_snippet_play_btn {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #202020b9;
+}
+
+.ath_snippet_play_btn img {
+    width: 50%;
+}
+
+.ath_song_card {
+    background-color: #0B0B0B;
+    border-radius: 2rem;
+    display: flex;
+    overflow: hidden;
+}
+
+.ath_song_info {
+    width: 80%;
+    padding-left: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ath_song_cover_box {
+    width: 100%;
+    background-image: url("../data/3baa4d90ebd753568b6b3452dc250796.jpg");
+    background-size: 100%;
+    background-position: center;
+}
+
+.ath_black_gradient {
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, #0B0B0B, #00000000);
+}
+
+.ath_card_artist_photo {
+    width: 3rem;
+    height: 3rem;
+    background-color: #67260a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.ath_card_artist_photo img {
+    width: 100%;
+    height: 100%;
+}
+
+.upload_overlay, .login_overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.605);
+}
+
+.upload_box {
+    width: fit-content;
+    height: fit-content;
+    background-color: #171F21;
+    border-radius: 2rem;
+    padding: 3rem 5rem;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.upload_mediabox {
+    width: 20rem;
+    border-radius: 2rem;
+    height: 20rem;
+    border: 0.1rem solid #eee;
+    cursor: pointer;
+}
+
+.upload_box input, .upload_box textarea {
+    border: none;
+    background-color: unset;
+    border-bottom: 0.1rem solid #9d9d9d;
+    color: white;
+    padding: 1rem 2rem;
+    width: 100%;
+}
+
+.upload_box input:focus, .upload_box textarea:focus {
+    border-bottom: 0.1rem solid #9d9d9d;
+    outline: none;
+}
+
+.login_box {
+    width: 100rem;
+}
+
+.login_form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 10rem;
+    row-gap: 3rem;
+}
+
+.register_photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    border: 0.1rem solid #eee;
+    cursor: pointer;
+    margin-bottom: 4rem;
+    overflow: hidden;
+    /* background-image: url("../data/CRAZY.jpg"); */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
