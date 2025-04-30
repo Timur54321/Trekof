@@ -29,7 +29,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = async (req, res) => {
-    const newUser = User.create(req.body);
+    const newUser = await User.create(req.body);
 
     createSendToken(newUser, 201, res);
 };
@@ -76,14 +76,36 @@ exports.protect = async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
     const freshUser = await User.findById(decoded.id);
+    
     if (!freshUser)
     {
-        res.status(401).json({
+        return res.status(401).json({
             status: 'failed',
             message: 'user belonging to this token does not exist lmaooo!'
         });
     }
 
     req.user = freshUser;
+    next();
+}
+
+exports.isLoggedIn = async (req, res, next) => {
+    if (req.cookies.jwt) {
+        try {
+            const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+            console.log(decoded.id);
+            const freshUser = await User.findById(decoded.id);
+            
+            if (!freshUser) return next();
+            
+            res.locals.user = freshUser;
+            
+            return next();
+        } catch (err) {
+            console.log(err);
+            return next();
+        }
+    }
+    
     next();
 }

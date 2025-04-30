@@ -134,8 +134,6 @@ const authorPageHandlers = function() {
         const file = this.files[0];
 
         $("#up_aud").append(`<p>${file.name}</p>`)
-
-        console.log(file);
     });
 };
 
@@ -150,6 +148,8 @@ $(document).ready(function() {
             let rs = $(".right_section");
             rs.empty();
             await rs.append(res.data.data.html);
+
+            
 
             authorPageHandlers();
         } catch (err) 
@@ -225,8 +225,6 @@ $(document).ready(function() {
                         photoKey: res.data.data.key
                     }
                 });
-
-                console.log(res1);
             }
         } catch (err) {
             console.log(err);
