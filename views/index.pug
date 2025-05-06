@@ -76,6 +76,9 @@ block content
                 .top_menu_item
                     p.top_menu_title Друзья
                     .underline.dp_none
+                if !user
+                    button.link_button#createaccbtn(style="width: 30rem; flex-shrink: 0;") Создать аккаунт
+                    button.link_button#loginbtn(style="width: 30rem; flex-shrink: 0;") Войти
             section.main_section
                 section.middle_part
                     .authors_box
@@ -200,11 +203,11 @@ block content
         .login_overlay.default
             .login_box.upload_box
                 p Логин
-                input(type="text" style="margin-bottom: 2rem;")
+                input#logininput(type="text" style="margin-bottom: 2rem;")
                 p Пароль
-                input(type="password" style="margin-bottom: 2rem;")
+                input#loginpassword(type="password" style="margin-bottom: 2rem;")
                 .default(style="justify-content: space-between;")
-                    button.link_button Отправить
+                    button.link_button#login Отправить
                     button.link_button#createacc Создать аккаунт
 
     .to_hide.dp_none#toregister

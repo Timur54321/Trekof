@@ -24,12 +24,12 @@ exports.getAuthorPage = () => {
 
                             <div style="width: 15rem; height: 15rem; border-radius: 50%; box-shadow: 0 0 2rem 0 rgba(255, 255, 255, 0.356); overflow: hidden;">
                                 <div style="width: 100%; height: 100%; display: flex; align-items: center;">
-                                    <img src="./data/authors/2cd312b369f6377166237a03b7215b56.jpg" alt="" style="width: 100%;">
+                                    <img src="./data/authors/2cd312b369f6377166237a03b7215b56.jpg" alt="" style="width: 100%;" id="authorprofilepic">
                                 </div>
                             </div>
 
                             <div>
-                                <p style="font-size: 3.6rem; margin-bottom: 1.4rem;">Psychosis</p>
+                                <p style="font-size: 3.6rem; margin-bottom: 1.4rem;" id="authorprofilename">Psychosis</p>
                                 <div style="display: flex; align-items: center; gap: 3rem;">
                                     <button class="link_button">Сообщество</button>
                                     <button class="link_button" id="upload_track"><img src="" alt="">Выпустить трек</button>
@@ -195,11 +195,11 @@ exports.getAuthorPage = () => {
                         </div>
                     </div>
                     <p>Название трека</p>
-                    <input type="text" style="margin-bottom: 2rem;">
+                    <input type="text" style="margin-bottom: 2rem;" id="trackname">
                     <p>Текст песни</p>
-                    <textarea name="" id="" style="margin-bottom: 4rem;"></textarea>
+                    <textarea name="" style="margin-bottom: 4rem;" id="tracktext"></textarea>
 
-                    <button class="link_button">Отправить</button>
+                    <button class="link_button" id="createrequest">Отправить</button>
                 </div>
             </div>
         </div>

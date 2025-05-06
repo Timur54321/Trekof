@@ -1,0 +1,125 @@
+.moderator_section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 8fr);
+}
+
+.mod_left_bar {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    background-color: white;
+}
+
+.mod_window {
+    width: 80%;
+    height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+.mod_window:hover {
+    box-shadow: 0 0 1rem 0 rgba(0,0,0,0.1);
+}
+
+.mod_window p {
+    color: black;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.mod_right_bar {
+    background-color: #F8F9FD;
+    padding-left: 5rem;
+}
+
+.mod_title {
+    font-size: 4.8rem;
+    margin-top: 10rem;
+    color: black;
+}
+
+.request {
+    width: 75%;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 1.5rem 2.5rem;
+    border-radius: 1.8rem;
+}
+
+.request_basic_info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.request_date {
+    width: 16rem;
+    font-size: 2rem;
+}
+
+.request_author {
+    width: 30rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.request_author p {
+    font-size: 2rem;
+}
+
+.request_player {
+    width: 40rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.req_vol_bar {
+    width: 100%;
+    height: 0.3rem;
+    border-radius: 2rem;
+    overflow: hidden;
+    background-color: rgb(200, 200, 200);
+}
+
+#tocancel, #toapprove {
+    background-color: unset;
+    border: 0.2rem solid #333;
+    outline: none;
+    cursor: pointer;
+    padding: 1rem 2rem;
+    font-size: 1.4rem;
+    border-radius: 1rem;
+    transition: color 0.2s, background-color 0.2s;
+    margin-right: 1rem;
+}
+
+#tocancel {
+    color: rgb(232, 73, 73);
+    border-color: rgb(232, 73, 73);
+}
+#tocancel:hover {
+    background-color: rgb(232, 73, 73);
+    color: white;
+}
+
+#toapprove {
+    color: rgb(30, 138, 30);
+    border-color: rgb(30, 138, 30);
+}
+#toapprove:hover {
+    background-color: rgb(30, 138, 30);
+    color: white;
+}

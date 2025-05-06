@@ -6,6 +6,8 @@ const objectRouter = require('./routes/objectRouter');
 const viewRouter = require('./routes/viewRouter');
 const htmlRouter = require('./routes/htmlRouter');
 const userRouter = require('./routes/userRouter');
+const mediafileRouter = require('./routes/mediafileRouter');
+const requestRouter = require('./routes/requestRouter');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -19,5 +21,7 @@ app.use('/api/v1/file', objectRouter);
 app.use('/', viewRouter);
 app.use('/api/v1/html', htmlRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/mediafiles', mediafileRouter);
+app.use('/api/v1/requests', requestRouter);
 
 module.exports = app;

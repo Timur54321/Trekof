@@ -11,17 +11,17 @@ const mediaFileSchema = new mongoose.Schema(
             ref: 'User',
             required: [true, 'Не указан исполнитель']
         },
-        audio: {
+        audioKey: {
             type: String,
             required: [true, 'Не указан путь или URL к медиафайлу']
         },
-        cover: {
+        coverKey: {
             type: String,
             required: [true, 'Не указано имя медиафайла']
         },
+        status: String,
         snippetStartTime: String,
-        text: String,
-        type: String
+        text: String
     }
 );
 

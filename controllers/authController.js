@@ -38,7 +38,7 @@ exports.login = async (req, res, next) => {
     const {email, password} = req.body;
 
     if (!email || !password) {
-        res.status(400).json({
+        return res.status(400).json({
             status: "failed",
             message: "Email or password was not provided!"
         });
@@ -47,7 +47,7 @@ exports.login = async (req, res, next) => {
     const user = await User.findOne({email}).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-        res.status(401).json({
+        return res.status(401).json({
             status: 'failed',
             message: 'Login or passowrd is incorrect'
         });
@@ -93,7 +93,6 @@ exports.isLoggedIn = async (req, res, next) => {
     if (req.cookies.jwt) {
         try {
             const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
-            console.log(decoded.id);
             const freshUser = await User.findById(decoded.id);
             
             if (!freshUser) return next();

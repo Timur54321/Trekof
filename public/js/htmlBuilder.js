@@ -1,100 +1,20 @@
-const leftSectionHTML = `
-    <section class="left_section">
-        <div class="top_section top_left_section">
-            <h1 class="company_name">ZZZvuk</h1>
-        </div>
+const authorPageHandlers = async function() {
+    let currentUser;
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/users/me'
+        });
 
-        <div class="left_section_menus">
+        $("#authorprofilepic").attr("src", `/api/v1/file/${res.data.photoKey}`);
+        $("#authorprofilename").text(res.data.name);
+        currentUser = res.data;
 
-            <div class="audio_hosting_menu">
-                <div class="hosting_menu_item hover_effect">
-                    <div class="active_hosting_page"></div>
-                    <img src="./data/icons/home.png" alt="" class="hosting_image">
-                    <p class="hosting_menu_text">Главная</p>
-                </div>
-                <div class="hosting_menu_item hover_effect">
-                    <div class="active_hosting_page hidden"></div>
-                    <img src="./data/icons/user.png" alt="" class="hosting_image">
-                    <p class="hosting_menu_text">Профиль</p>
-                </div>
-                <div class="hosting_menu_item hover_effect">
-                    <div class="active_hosting_page hidden"></div>
-                    <img src="./data/icons/star.png" alt="" class="hosting_image">
-                    <p class="hosting_menu_text">Фавориты</p>
-                </div>
-                <div class="hosting_menu_item hover_effect">
-                    <div class="active_hosting_page hidden"></div>
-                    <img src="./data/icons/rock-guitar.png" alt="" class="hosting_image">
-                    <p class="hosting_menu_text">Жанры</p>
-                </div>
-            </div>
+    } catch (err)
+    {
+        console.log(err);
+    }
 
-            <div class="messenger_menu">
-                <div class="hosting_menu_item" style="padding-top: 0;">
-                    <div class="active_hosting_page hidden"></div>
-                    <img src="./data/icons/message.png" alt="" class="messenger_image">
-                    <p class="hosting_menu_text">Мессенджер</p>
-                </div>
-
-                <div class="hosting_menu_item message_box hover_effect">
-                    <div class="message_info">
-                        <div class="active_hosting_page hidden"></div>
-                        <div class="menu_profile_image_container"><img src="./data/authors/2cd312b369f6377166237a03b7215b56.jpg" alt="" class="profile_image"></div>
-                        <p class="hosting_menu_text">Неадекват</p>
-                    </div>
-                    <div class="income_messages_circle">
-                        <p class="income_message_amount">2</p>
-                    </div>
-                </div>
-
-                <div class="hosting_menu_item message_box hover_effect">
-                    <div class="message_info">
-                        <div class="active_hosting_page hidden"></div>
-                        <div class="menu_profile_image_container"><img src="./data/authors/6e268e284174e29e6daf7d516cf7b485.jpg" alt="" class="profile_image"></div>
-                        <p class="hosting_menu_text">Димас</p>
-                    </div>
-                    <div class="income_messages_circle">
-                        <p class="income_message_amount">4</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="management_menu">
-
-                <div class="management_title_box">
-                    <div class="title_box">
-                        <img src="./data/icons/profile.png" alt="" style="width: 2.5rem;">
-                        <p class="management_menu_title">Управление</p>
-                    </div>
-                    <img src="./data/icons/yellow_next.png" alt="" class="togo_management_icon">
-                </div>
-
-                <div class="stats_container">
-                    <div class="stats_holder">
-                        <img src="./data/icons/loading.png" alt="">
-                        <div class="stats_box">
-                            <p class="stat_title">Статистика</p>
-                            <p class="stat_info">Ваши треки и альбомы</p>
-                        </div>
-                    </div>
-                    <div class="stats_holder">
-                        <img src="./data/icons/checkmark.png" alt="">
-                        <div class="stats_box">
-                            <p class="stat_title">Релизы</p>
-                            <p class="stat_info">Ваши треки и альбомы</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-        
-    </section>
-`;
-
-const authorPageHandlers = function() {
     $("#upload_track").click(() => {
         $("#upload_hide").show(200);
     });
@@ -135,6 +55,77 @@ const authorPageHandlers = function() {
 
         $("#up_aud").append(`<p>${file.name}</p>`)
     });
+
+    $("#createrequest").click(async function() {
+        const cover = $("#upload_cover")[0].files[0];
+        const audio = $("#upload_audio")[0].files[0];
+        const trackName = $("#trackname").val();
+        const trackText = $("#tracktext").val();
+        const formData1 = new FormData();
+        const formData2 = new FormData();
+
+        if (cover) {
+            formData1.append('file', cover);
+        }
+        if (audio) {
+            formData2.append('file', audio);
+        }
+        
+        try {
+            console.log(cover, audio, trackName, trackText);
+            if (cover && audio && trackName && trackText) {
+                const res1 = await axios({
+                    method: 'POST',
+                    url: '/api/v1/file/upload',
+                    data: formData1
+                });
+
+                const res2 = await axios({
+                    method: 'POST',
+                    url: '/api/v1/file/upload',
+                    data: formData2
+                });
+
+                const res3 = await axios({
+                    method: 'POST',
+                    url: '/api/v1/mediafiles',
+                    data: {
+                        name: cover.name,
+                        artist: currentUser._id,
+                        coverKey: res1.data.data.key,
+                        audioKey: res2.data.data.key,
+                        status: 'checking',
+                        text: trackText
+                    }
+                });
+
+                if (res3)
+                {
+                    console.log(res3);
+
+                    const res4 = await axios({
+                        method: 'POST',
+                        url: '/api/v1/requests',
+                        data: {
+                            mediaFile: res3.data.data._id,
+                            artist: currentUser._id,
+                            status: "На рассмотрении"
+                        }
+                    });
+
+                    if (res4) {
+                        alert("нет ну это просто пиздец!");
+                    }
+                }
+            }
+            else {
+                alert("чет не хватает братуха!")
+            }
+            
+        } catch (err) {
+            console.log(err);
+        }
+    });
 };
 
 $(document).ready(function() {
@@ -149,8 +140,6 @@ $(document).ready(function() {
             rs.empty();
             await rs.append(res.data.data.html);
 
-            
-
             authorPageHandlers();
         } catch (err) 
         {
@@ -162,6 +151,14 @@ $(document).ready(function() {
             }
         }
     });
+
+    $("#createaccbtn").click(function () {
+        $("#toregister").show(200);
+    });
+
+    $("#loginbtn").click(function () {
+        $("#tologin").show(200);
+    })
 
     $("#createacc").click(function() {
         $("#tologin").hide(200);
@@ -206,28 +203,66 @@ $(document).ready(function() {
             formData.append('file', file);
         }
         try {
-            const res = await axios({
-                method: 'POST',
-                url: '/api/v1/file/upload',
-                data: formData
-            });
-
-            if (res.data.data.key && name && email && password && passwordConfirm) 
+            if (name && email && password && passwordConfirm)
             {
-                const res1 = await axios({
+                const res = await axios({
                     method: 'POST',
-                    url: '/api/v1/users/signup',
-                    data: {
-                        name, 
-                        email,
-                        password,
-                        passwordConfirm,
-                        photoKey: res.data.data.key
-                    }
+                    url: '/api/v1/file/upload',
+                    data: formData
                 });
+    
+                if (res.data.data.key) 
+                {
+                    const res1 = await axios({
+                        method: 'POST',
+                        url: '/api/v1/users/signup',
+                        data: {
+                            name, 
+                            email,
+                            password,
+                            passwordConfirm,
+                            photoKey: res.data.data.key
+                        }
+                    });
+    
+                    if (res1.status == 201)
+                    {
+                        alert("Вы были жестоко зарегистрированы!");
+                        $("#toregister").hide(200);
+                    }
+                }
             }
         } catch (err) {
             console.log(err);
+        }
+    });
+
+    $("#login").click(async function () {
+        const email = $("#logininput")?.val();
+        const password = $("#loginpassword")?.val();
+
+        if (login && password)
+        {
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/users/login',
+                    data: {
+                        email,
+                        password
+                    }
+                });
+
+                if (res.status === 200) {
+                    alert("energetic drink");
+                    console.log(res);
+                    if (res.data.data.user.role === "moderator") {
+                        window.location = "/moderator"
+                    }
+                }
+            } catch (err) {
+                console.log(err);
+            }
         }
     });
 });
