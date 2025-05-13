@@ -79,6 +79,9 @@ block content
                 if !user
                     button.link_button#createaccbtn(style="width: 30rem; flex-shrink: 0;") Создать аккаунт
                     button.link_button#loginbtn(style="width: 30rem; flex-shrink: 0;") Войти
+                if user 
+                    .default#notifications(style="cursor: pointer; width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 50%; border: 0.1rem solid rgb(116, 116, 116)")
+                        img(src="/data/icons/notification.png" alt="" width="50%")
             section.main_section
                 section.middle_part
                     .authors_box
@@ -88,9 +91,10 @@ block content
                         p.genres_title.subtitle_style Ислледуйте новые жанры
 
                         .authors_list_box
-                            .author_holder
-                                .author_image_holder
-                                    img(src="./data/authors/79bc6917c56dbf8f278052913a5e32fa.jpg", alt="")
+                            each author in authors
+                                .author_holder.artisto(id=author._id)
+                                    .author_image_holder
+                                        img(src=`/api/v1/file/${author.photoKey}`, alt="")
 
                     .widgets_box
                         p.widget_title.title_style Вам понравится
@@ -230,4 +234,30 @@ block content
                         input#regpasswordconfirm(type="password" style="margin-bottom: 2rem;")
                 .default(style="justify-content: end;")
                     button.link_button#signup Отправить
+    .to_hide.dp_none#notbox
+        .notification_overlay
+            .not_box
+                each request in requests
+                    .not_item(id=request._id)
+                        p.not_status #{request.mediaFile.name} &#183; 
+                            if request.status == "На рассмотрении"
+                                span(style="color: #B4A124;") На рассмотрении
+                            if request.status == "Одобрено"
+                                span(style="color: #2a7137;") Одобрено
+                            if request.status == "Отклонено"
+                                span(style="color: #CC3E44;") Отклонено
+                        if request.status == "На рассмотрении"
+                            p.not_info Ваш трек находится в рассмотрении
+                        if request.status == "Одобрено"
+                            p.not_info Ваш трек был загружен на платформу, вы можете увидеть его у себя в профиле
+                            button.link_button#delapprovereq ок
+                        if request.status == "Отклонено"
+                            p.not_info= request.reason
+                            button.link_button#delcancelreq ок
+    .to_hide.dp_none#playlistbox 
+        .playlist_overlay 
+            .not_box#wadehell
+                each playlist in playlists 
+                    .not_item 
+                        p.not_status #{playlist.name}
     input#regpic(type="file" style="display: none;")

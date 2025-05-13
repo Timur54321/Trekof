@@ -8,6 +8,39 @@ const authorPageHandlers = async function() {
 
         $("#authorprofilepic").attr("src", `/api/v1/file/${res.data.photoKey}`);
         $("#authorprofilename").text(res.data.name);
+
+        const res1 = await axios({
+            method: 'GET',
+            url: `/api/v1/mediafiles/${res.data._id}`
+        });
+
+        if (res1.status === 200) {
+            for (let i = 0; i < res1.data.data.length; i++) {
+                $("#tracksHolder").append(
+                    `
+                        <div class="track">
+                            <div class="track_item">
+
+                                <div style="display: flex; align-items: center; gap: 2.4rem;">
+                                    <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
+                                        <img src="/api/v1/file/${res1.data.data[i].coverKey}" alt="" width="100%">
+                                    </div>
+                                    <p style="font-size: 2rem;">${res1.data.data[i].name}</p>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 2.4rem;">
+                                    <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
+                                    <img src="./data/icons/share.png" alt="" width="20rem">
+                                    <img src="./data/icons/more.png" alt="" width="20rem">
+                                    <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    `
+                )
+            }
+        }
         currentUser = res.data;
 
     } catch (err)
@@ -72,7 +105,6 @@ const authorPageHandlers = async function() {
         }
         
         try {
-            console.log(cover, audio, trackName, trackText);
             if (cover && audio && trackName && trackText) {
                 const res1 = await axios({
                     method: 'POST',
@@ -90,7 +122,7 @@ const authorPageHandlers = async function() {
                     method: 'POST',
                     url: '/api/v1/mediafiles',
                     data: {
-                        name: cover.name,
+                        name: trackName,
                         artist: currentUser._id,
                         coverKey: res1.data.data.key,
                         audioKey: res2.data.data.key,
@@ -114,7 +146,7 @@ const authorPageHandlers = async function() {
                     });
 
                     if (res4) {
-                        alert("нет ну это просто пиздец!");
+                        alert("Заявка оформлена!");
                     }
                 }
             }
@@ -128,26 +160,140 @@ const authorPageHandlers = async function() {
     });
 };
 
-$(document).ready(function() {
-    $("#profile").click(async () => {
-        try {
-            const res = await axios({
-                method: 'GET',
-                url: '/api/v1/html/authorPage'
-            });
-        
-            let rs = $(".right_section");
-            rs.empty();
-            await rs.append(res.data.data.html);
+////////////////////////////////////////////////////////////////////////
+const artistPageHandlers = async artist => {
+    let currentUser;
+    try {
+        const resUser = await axios({
+            method: 'GET',
+            url: '/api/v1/users/me'
+        });
+        currentUser = resUser.data;
 
-            authorPageHandlers();
-        } catch (err) 
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/users/${artist}`
+        });        
+
+        if (res.status === 200) {
+            $("#authorprofilepic").attr("src", `/api/v1/file/${res.data.data.photoKey}`);
+            $("#authorprofilename").text(res.data.data.name);
+        }
+
+        const res1 = await axios({
+            method: 'GET',
+            url: `/api/v1/mediafiles/${res.data.data._id}`
+        });
+
+        if (res1.status === 200) {
+            for (let i = 0; i < res1.data.data.length; i++) {
+                await $("#tracksHolder").append(
+                    `
+                        <div class="track" id="${res1.data.data[i]._id}">
+                            <div class="track_item">
+
+                                <div style="display: flex; align-items: center; gap: 2.4rem;">
+                                    <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
+                                        <img src="/api/v1/file/${res1.data.data[i].coverKey}" alt="" width="100%">
+                                    </div>
+                                    <p style="font-size: 2rem;">${res1.data.data[i].name}</p>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 2.4rem;">
+                                    <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
+                                    <img src="./data/icons/share.png" alt="" width="20rem">
+                                    <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
+                                    <img src="./data/icons/threedots.png" alt="" width="20rem">
+                                    <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    `
+                )
+            }
+        }
+
+        let myPlaylists = await axios({
+            method: 'GET',
+            url: `/api/v1/playlists/${currentUser._id}`
+        });
+
+        myPlaylists = myPlaylists.data.data;
+
+        for (let i = 0; i < myPlaylists.length; i++)
         {
-            if (err.response.status == 401)
-            {
-                alert("Необходимо авторизоваться!");
+            $("#wadehell").append(
+                `
+                    <div class="not_item" id="${myPlaylists[i]._id}"><p class="not_status">${myPlaylists[i].name}</p></div>
+                `
+            )
+        }
 
-                $("#tologin").show(200);
+    } catch (err) {
+        alert("Something went wrongelo tartalelo");
+        console.log(err);
+    }
+
+    audioFileHandlers();
+};
+
+let currentUser;
+$(document).ready(async function() {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/users/me'
+        });
+
+        currentUser = res.data;
+
+    } catch (err)
+    {
+        console.log(err);
+    }
+
+    $("#profile").click(async () => {
+        if (currentUser?.role === "user")
+        {
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: '/api/v1/html/userPage'
+                });
+
+                if (res.status === 200) {
+                    let mp = $(".middle_part");
+                    mp.empty();
+                    await mp.append(res.data.data.html);
+
+                    userPageHandlers();
+                }
+            } catch (err) {
+                alert("Something went catastrofically wrongelo");
+                console.log(err);
+            }
+        }
+        else {
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: '/api/v1/html/authorPage'
+                });
+            
+                let rs = $(".right_section");
+                rs.empty();
+                await rs.append(res.data.data.html);
+    
+                authorPageHandlers();
+            } catch (err) 
+            {
+                if (err.response.status == 401)
+                {
+                    alert("Необходимо авторизоваться!");
+    
+                    $("#tologin").show(200);
+                }
             }
         }
     });
@@ -190,7 +336,7 @@ $(document).ready(function() {
         }
     });
 
-    $("#signup").click(async function() {
+    $("#signup")?.click(async function() {
         const name = $("#regname")?.val();
         const email = $("#regemail")?.val();
         const password = $("#regpassword")?.val();
@@ -237,7 +383,7 @@ $(document).ready(function() {
         }
     });
 
-    $("#login").click(async function () {
+    $("#login")?.click(async function () {
         const email = $("#logininput")?.val();
         const password = $("#loginpassword")?.val();
 
@@ -255,7 +401,6 @@ $(document).ready(function() {
 
                 if (res.status === 200) {
                     alert("energetic drink");
-                    console.log(res);
                     if (res.data.data.user.role === "moderator") {
                         window.location = "/moderator"
                     }
@@ -265,4 +410,155 @@ $(document).ready(function() {
             }
         }
     });
+
+    $("#notifications").click(function() {
+        $("#notbox").show(200);
+    });
+
+    $(".notification_overlay").click(function (el) {
+        if ($(el.target)["0"] == this) {
+            $("#notbox").hide(200);
+        }
+    });
+
+    $("#delapprovereq").click(async function() {
+        try {
+            const res = await axios({
+                method: 'DELETE',
+                url: `/api/v1/requests/approved/${this.parentNode.id}`
+            });
+
+            if (res.status == 200) {
+                alert("Успех!");
+            }
+        } catch (err) {
+            alert("Something went catastrofically wrong");
+            console.log(err);
+        }
+    });
+
+    $("#delcancelreq").click(async function() {
+        try {
+            const res = await axios({
+                method: 'DELETE',
+                url: `/api/v1/requests/canceled/${this.parentNode.id}`
+            });
+
+            if (res.status == 200) {
+                alert("Успех!");
+            }
+        } catch (err) {
+            alert("something went wrongelo");
+            console.log(err);
+        }
+    });
+
+    $(".artisto").click(async function() {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/artistPage'
+            });
+
+            let rs = $(".right_section");
+            rs.empty();
+            await rs.append(res.data.data.html);
+
+            artistPageHandlers(this.id);   
+        } catch (err) {
+            alert("SOmethign went extremely outragegous");
+            console.log(err);
+        }
+    });
 });
+
+
+const audioFileHandlers = () => {
+    $(".likeTrack").click(async function () {
+        console.log('imsorryniga')
+        if (currentUser)
+        {
+            try {
+                console.log(this.parentNode.parentNode);
+                const res = await axios({
+                    method: 'PATCH',
+                    url: `/api/v1/mediafiles/${this.parentNode.parentNode.parentNode.id}`,
+                    data: {
+                        playlist: currentUser.favourites
+                    }
+                });
+    
+                if (res.status === 201) {
+                    alert("this track was liked extraordinary way");
+                }
+            } catch (err) {
+                alert("something went wrongelo");
+                console.log(err);
+            }
+        } else {
+            alert("You are not logged in nigga!");
+        }
+    });
+};
+
+const userPageHandlers = async function () {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/mediafiles/playlist/${currentUser.favourites}`
+        });
+
+        if (res.status === 200) {
+            for (let i = 0; i < res.data.data.length; i++) {
+                $("#usersFavourites").append(
+                    `
+                        <div class="music_box" data-index="1">
+                            <div class="music_box_inner">
+                                <div class="music_image_holder">
+                                    <img src="/api/v1/file/${res.data.data[i].coverKey}" alt="">
+                                </div>
+                                <div class="music_info">
+                                    <p class="music_name">${res.data.data[i].name}</p>
+                                    <p class="music_author">${res.data.data[i].artist.name}</p>
+                                </div>
+                            </div>
+
+                            <div class="music_box_inner">
+                                <p class="music_duration">2:44</p>
+                                <img src="./data/icons/more.png" alt="" class="add_music_icon">
+                            </div>
+                        </div>
+                    `
+                );
+            }
+        }
+    } catch (err) {
+        alert("Самая любимая музыка здесь играет");
+        console.log(err);
+    }
+
+    $("#createPlaylist").click(async function() {
+        const whateverTheAnswerIs = prompt("Введите имя для плейлиста: ");
+        if (whateverTheAnswerIs) {
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/playlists',
+                    data: {
+                        name: whateverTheAnswerIs,
+                        owner: currentUser._id,
+                        type: "regular"
+                    }
+                });
+
+                if (res.status === 200) {
+                    alert("Плейлист был официально создан!");
+                }
+            } catch (err) {
+                alert("Something went wrongelo!!!");
+                console.log(err);
+            }
+        }
+    });
+}
+

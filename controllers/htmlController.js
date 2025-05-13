@@ -8,3 +8,21 @@ exports.getAuthorPage = (req, res) => {
         }
     });
 };
+
+exports.getUserPage = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            html: HB.getUserPage()
+        }
+    })
+};
+
+exports.getArtistPage = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            html: HB.getArtistPage()
+        }
+    })
+};

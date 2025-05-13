@@ -8,24 +8,13 @@ const playlistSchema = new mongoose.Schema(
         },
         owner: {
             type: mongoose.Schema.ObjectId,
-            ref: 'User',
-            required: [true, 'Не указан исполнитель']
+            ref: 'User'
         },
-        mediafiles: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'MediaFile'
-            }
-        ],
         creationDate: {
             type: Date,
             default: Date.now,
         },
-        access: {
-            type: String,
-            enum: ['public', 'private'],
-            requried: [true, 'Не указан доступ']
-        }
+        type: String
     }
 );
 

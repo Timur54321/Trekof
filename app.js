@@ -8,6 +8,7 @@ const htmlRouter = require('./routes/htmlRouter');
 const userRouter = require('./routes/userRouter');
 const mediafileRouter = require('./routes/mediafileRouter');
 const requestRouter = require('./routes/requestRouter');
+const playlistRouter = require('./routes/playlistRouter');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -23,5 +24,6 @@ app.use('/api/v1/html', htmlRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/mediafiles', mediafileRouter);
 app.use('/api/v1/requests', requestRouter);
+app.use('/api/v1/playlists', playlistRouter);
 
 module.exports = app;

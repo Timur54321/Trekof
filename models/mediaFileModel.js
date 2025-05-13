@@ -19,6 +19,10 @@ const mediaFileSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Не указано имя медиафайла']
         },
+        playlist: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Playlist'
+        },
         status: String,
         snippetStartTime: String,
         text: String
