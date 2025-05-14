@@ -28,5 +28,17 @@ exports.addTrack = async (req, res) => {
     );
     
     res.status(200).json(playlists);
+};
+
+exports.getTracks = async (req, res) => {
+    const playlist = await Playlist.findById(req.params.key).populate({
+        path: 'mediafiles',
+        populate: { // Вложенный populate для author
+          path: 'artist',
+          model: 'User'
+        }
+      });
+
+    res.status(200).json(playlist.mediafiles);
 }
 

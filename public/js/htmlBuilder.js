@@ -618,6 +618,44 @@ const userPageHandlers = async function () {
         console.log(err);
     }
 
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/playlists/tracks/${currentUser.favourites}`
+        });
+
+        console.log(res.data);
+
+        if (res.status === 200) {
+            const favTracks = res.data;
+            for (let i = 0; i < favTracks.length; i++) {
+                $("#usersFavourites").append(
+                    `
+                    <div class="music_box" data-index="4">
+                        <div class="music_box_inner">
+                            <div class="music_image_holder">
+                                <img src="/api/v1/flie/${favTracks[i].coverKey}" alt="">
+                            </div>
+                            <div class="music_info">
+                                <p class="music_name">${favTracks[i].name}</p>
+                                <p class="music_author"></p>
+                            </div>
+                        </div>
+    
+                        <div class="music_box_inner">
+                            <p class="music_duration">1:35</p>
+                            <img src="./data/icons/more.png" alt="" class="add_music_icon">
+                        </div>
+                    </div>
+                    `
+                );
+            }
+        }
+    } catch (err) {
+        alert("Whatever");
+        console.log(err);
+    }
+
     $("#createPlaylist").click(async function() {
         const whateverTheAnswerIs = prompt("Введите имя для плейлиста: ");
         if (whateverTheAnswerIs) {

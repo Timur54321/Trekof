@@ -15,7 +15,7 @@ const playlistSchema = new mongoose.Schema(
             default: Date.now,
         },
         type: String,
-        mediafiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AudioFile' }]
+        mediafiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MediaFile' }]
     }
 );
 

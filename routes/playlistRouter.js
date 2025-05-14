@@ -4,6 +4,7 @@ const playlistController = require('../controllers/playlistController');
 const router = express.Router();
 
 router.post('/', playlistController.createOne);
+router.get('/tracks/:key', playlistController.getTracks);
 router.get('/:key', playlistController.getPlaylistOfUser);
 router.patch('/addTrack/:key', playlistController.addTrack);
 
