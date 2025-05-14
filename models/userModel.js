@@ -40,22 +40,10 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.ObjectId,
             ref: "Playlist"
         },
-        friends: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: "User"
-            }
-        ],
         followedChannels: [
             {
                 type: mongoose.Schema.ObjectId,
                 ref: "Channel"
-            }
-        ],
-        followedArtists: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: "User"
             }
         ],
         chats: [

@@ -163,6 +163,7 @@ const authorPageHandlers = async function() {
 ////////////////////////////////////////////////////////////////////////
 const artistPageHandlers = async artist => {
     let currentUser;
+    let currentTrack;
     try {
         const resUser = await axios({
             method: 'GET',
@@ -203,7 +204,7 @@ const artistPageHandlers = async artist => {
                                     <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
                                     <img src="./data/icons/share.png" alt="" width="20rem">
                                     <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
-                                    <img src="./data/icons/threedots.png" alt="" width="20rem">
+                                    <img class="threeDotsPlaylist" src="./data/icons/threedots.png" alt="" width="20rem">
                                     <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
                                 </div>
 
@@ -223,11 +224,11 @@ const artistPageHandlers = async artist => {
 
         for (let i = 0; i < myPlaylists.length; i++)
         {
-            $("#wadehell").append(
+            await $("#wadehell").append(
                 `
-                    <div class="not_item" id="${myPlaylists[i]._id}"><p class="not_status">${myPlaylists[i].name}</p></div>
+                    <div class="not_item playlist_item" id="${myPlaylists[i]._id}"><p class="not_status">${myPlaylists[i].name}</p></div>
                 `
-            )
+            );
         }
 
     } catch (err) {
@@ -530,33 +531,93 @@ $(document).ready(async function() {
 
 const audioFileHandlers = () => {
     $(".likeTrack").click(async function () {
-        console.log('imsorryniga')
         if (currentUser)
         {
             try {
-                console.log(this.parentNode.parentNode);
                 const res = await axios({
                     method: 'PATCH',
-                    url: `/api/v1/mediafiles/${this.parentNode.parentNode.parentNode.id}`,
+                    url: `/api/v1/playlists/addTrack/${currentUser.favourites}`,
                     data: {
-                        playlist: currentUser.favourites
+                        audioFileId: this.parentNode.parentNode.parentNode.id
                     }
                 });
-    
-                if (res.status === 201) {
-                    alert("this track was liked extraordinary way");
+
+                if (res.status === 200) {
+                    alert("Трек был экстримально добавлен в список понравившихся!");
                 }
             } catch (err) {
-                alert("something went wrongelo");
+                alert("Произошла ошибка при попытке лайкнуть трек");
                 console.log(err);
             }
         } else {
-            alert("You are not logged in nigga!");
+            alert("You are not logged in!");
         }
     });
+
+    $(".threeDotsPlaylist").click(function () {
+        currentTrack = this.parentNode.parentNode.parentNode.id;
+        $("#playlistbox").show(200);
+    });
+
+    $(".playlist_overlay").click(function() {
+        $("#playlistbox").hide(200);
+    });
+
+    $(".playlist_item").click(async function () {
+        try {
+            const res = await axios({
+                method: 'PATCH',
+                url: `/api/v1/playlists/addTrack/${this.id}`,
+                data: {
+                    audioFileId: currentTrack
+                }
+            });
+
+            if (res.status === 200) {
+                alert("Трек был добавлен в плейлист!");
+                $("#playlistbox").hide(200);
+            }
+            
+        } catch (err) {
+            alert("Something went extremely wrong");
+        }
+    });
+
 };
 
 const userPageHandlers = async function () {
+
+    $("#userProfilePic").attr('src', `/api/v1/file/${currentUser.photoKey}`);
+    $("#userName").text(currentUser.name);
+    $("#userEmail").text(currentUser.email);
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/friendLinks/myFriends'
+        });
+
+        if (res.status === 200) {
+            const myFriends = res.data;
+
+
+            for (let i = 0; i < myFriends.length; i++) {
+                $("#myFriendsList").append(
+                    `
+                        <div class="author_holder">
+                            <div class="author_image_holder">
+                                <img src="/api/v1/file/${myFriends[i].photoKey}" alt="">
+                            </div>
+                        </div>
+                    `
+                )
+            }
+        }
+    } catch (err) {
+        alert("soemthing went wronghelo");
+        console.log(err);
+    }
+
     $("#createPlaylist").click(async function() {
         const whateverTheAnswerIs = prompt("Введите имя для плейлиста: ");
         if (whateverTheAnswerIs) {
@@ -719,14 +780,16 @@ const messengerPageHandlers = async function(userid) {
     try {
         const res = await axios({
             method: 'GET',
-            url: '/api/v1/chats'
+            url: '/api/v1/chats/myChats'
         });
+
+        console.log(res.data);
 
         if (res.status == 200) {
             for (let i = 0; i < res.data.length; i++) {
                 let otherUser;
-                if (res.data.user1._id === currentUser._id) otherUser = res.data.user2;
-                else otherUser = res.data.user1;
+                if (res.data[i].user1._id === currentUser._id) otherUser = res.data[i].user2;
+                else otherUser = res.data[i].user1;
                 $("#chatsList").append(`
                     <div class="ms_message_field">
                         <div style="display: flex; align-items: center; gap: 2rem;">
@@ -831,7 +894,7 @@ const printMessages = async function(chatid) {
             mh.scrollTo(0, mh.scrollHeight);
         }
     } catch (err) {
-        alert("Something went wrongelo");
+        alert("No messages lol");
         console.log(err);
     }
 }

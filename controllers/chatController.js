@@ -38,15 +38,15 @@ exports.getChat = async (req, res) => {
 };
 
 exports.getMyChats = async (req, res) => {
-    const userId = req.params.key;
+    const userId = res.locals.user._id;
     
     const chats = await Chat.find({
-        $or: [
-            { user1: userId },
-            { user2: userId }
-        ]
+      $or: [
+          { user1: userId },
+          { user2: userId }
+      ]
     }).populate(['user1', 'user2']);
 
     res.status(200).json(chats);
-}
+};
 

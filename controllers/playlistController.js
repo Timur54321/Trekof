@@ -18,4 +18,15 @@ exports.getPlaylistOfUser = async (req, res) => {
     });
 };
 
+exports.addTrack = async (req, res) => {
+    const playlistId = req.params.key;
+
+    const playlists = await Playlist.findByIdAndUpdate(
+        playlistId, // ID плейлиста
+        { $push: { mediafiles: req.body.audioFileId } }, // audiofileId - ObjectId аудиофайла
+        { new: true } // Вернуть обновленный документ
+    );
+    
+    res.status(200).json(playlists);
+}
 

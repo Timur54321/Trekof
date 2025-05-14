@@ -215,15 +215,15 @@ exports.getUserPage = user => {
         <div class="userStatBox">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 2rem;">
                 <div class="userInfoPic">
-                    <img src="./data/users/77685a2078a2e86d2bdfd685a6d6f7ff.jpg" alt="" width="100%">
+                    <img id="userProfilePic" src="./data/users/77685a2078a2e86d2bdfd685a6d6f7ff.jpg" alt="" width="100%">
                 </div>
                 <button class="link_button" style="height: 2rem; display: flex; align-items: center; justify-content: center;">
                     <img src="./data/icons/edit.png" alt="" height="20rem">
                 </button>
             </div>
             <div>
-                <p style="font-size: 2.4rem;">Таинственный мухамор</p>
-                <p style="font-size: 1.2rem; margin-bottom: 2rem;">gti230504@gmail.com</p>
+                <p style="font-size: 2.4rem;" id="userName">Таинственный мухамор</p>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem;" id="userEmail">gti230504@gmail.com</p>
                 <button class="link_button" style="height: 2rem; display: flex; align-items: center; justify-content: center;">
                     <img src="./data/icons/edit.png" alt="" height="20rem">
                 </button>
@@ -237,60 +237,12 @@ exports.getUserPage = user => {
             </div>
             <p class="genres_title subtitle_style">Начните общение</p>
 
-            <div class="authors_list_box">
+            <div class="authors_list_box" id="myFriendsList">
 
                 <div class="author_holder">
 
                     <div class="author_image_holder">
                         <img src="./data/authors/79bc6917c56dbf8f278052913a5e32fa.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/1373579386907938d97323d87405e863.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/6e268e284174e29e6daf7d516cf7b485.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/2cd312b369f6377166237a03b7215b56.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/b6e577a6194c4232989d4f6529fd054c.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/c46a5e9932b199f425948bad82a14e3f.jpg" alt="">
-                    </div>
-
-                </div>
-                
-                <div class="author_holder">
-
-                    <div class="author_image_holder">
-                        <img src="./data/authors/e1e5f13d9839c40a8abf7b9bcc5c46cc.jpg" alt="">
                     </div>
 
                 </div>
@@ -600,10 +552,10 @@ exports.getArtistPage = () => {
             </div>
         </div>
 
-        <div class="to_hide" id="playlistbox">
+        <div class="to_hide dp_none" id="playlistbox">
             <div class="playlist_overlay">
                 <div class="not_box" id="wadehell">
-                
+
                 </div>
             </div>
         </div>
