@@ -7,5 +7,7 @@ const router = express.Router();
 router.get('/authorPage', authController.protect, htmlController.getAuthorPage);
 router.get('/artistPage', htmlController.getArtistPage);
 router.get('/userPage', htmlController.getUserPage);
+router.get('/friendsPage', htmlController.getFriendsPage);
+router.get('/messenger', htmlController.getMessengerPage);
 
 module.exports = router;

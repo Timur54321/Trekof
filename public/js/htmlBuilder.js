@@ -470,6 +470,61 @@ $(document).ready(async function() {
             console.log(err);
         }
     });
+
+    $("#friendsPage").click(async function () {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/friendsPage'
+            });
+
+            let mp = $(".middle_part");
+            mp.empty();
+            await mp.append(res.data.data.html);
+
+            friendsPageHanlders();
+
+        } catch (err) {
+            alert("somethign wrongelo");
+            console.log(err);
+        }
+    });
+
+    $(".acceptFriendRequest").click(async function() {
+        try {
+            const res = await axios({
+                method: 'PATCH',
+                url: `/api/v1/friendLinks/${this.parentNode.id}`,
+                data: {
+                    status: 'friends'
+                }
+            });
+
+            if (res.status === 200) {
+                alert("У вас теперь есть друг!");
+            }
+        } catch (err) {
+            alert("whathever");
+            console.log(err);
+        }
+    });
+
+    $(".declineFriendRequest").click(async function() {
+        try {
+            const res = await axios({
+                method: 'DELETE',
+                url: `/api/v1/friendLinks/${this.parentNode.id}`
+            });
+
+            if (res.status === 203) {
+                alert("zamechatelno");
+                $(this.parentNode).hide(200);
+            }
+        } catch (err) {
+            alert("something wronhelo");
+            console.log(err);
+        }
+    });
 });
 
 
@@ -502,41 +557,6 @@ const audioFileHandlers = () => {
 };
 
 const userPageHandlers = async function () {
-    try {
-        const res = await axios({
-            method: 'GET',
-            url: `/api/v1/mediafiles/playlist/${currentUser.favourites}`
-        });
-
-        if (res.status === 200) {
-            for (let i = 0; i < res.data.data.length; i++) {
-                $("#usersFavourites").append(
-                    `
-                        <div class="music_box" data-index="1">
-                            <div class="music_box_inner">
-                                <div class="music_image_holder">
-                                    <img src="/api/v1/file/${res.data.data[i].coverKey}" alt="">
-                                </div>
-                                <div class="music_info">
-                                    <p class="music_name">${res.data.data[i].name}</p>
-                                    <p class="music_author">${res.data.data[i].artist.name}</p>
-                                </div>
-                            </div>
-
-                            <div class="music_box_inner">
-                                <p class="music_duration">2:44</p>
-                                <img src="./data/icons/more.png" alt="" class="add_music_icon">
-                            </div>
-                        </div>
-                    `
-                );
-            }
-        }
-    } catch (err) {
-        alert("Самая любимая музыка здесь играет");
-        console.log(err);
-    }
-
     $("#createPlaylist").click(async function() {
         const whateverTheAnswerIs = prompt("Введите имя для плейлиста: ");
         if (whateverTheAnswerIs) {
@@ -560,5 +580,258 @@ const userPageHandlers = async function () {
             }
         }
     });
+};
+
+const friendsPageHanlders = async function() {
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/friendLinks/myFriends'
+        });
+
+        for (let i = 0; i < res.data.length; i++) {
+            await $(".friendsSearchHolder").append(
+                `
+                    <div class="friend_item" id="${res.data[i]._id}">
+                        <div style="display: flex; align-items: center; justify-content: center; width: 12rem; height: 12rem; border-radius: 50%; overflow: hidden;">
+                            <img src="/api/v1/file/${res.data[i].photoKey}" alt="" width="100%">
+                        </div>
+                        <div>
+                            <p style="font-size: 1.8rem; margin-bottom: 1rem;">${res.data[i].name}</p>
+                            <div>
+                                <button class="link_button idOpenChat" style="margin-right: 2rem;">Написать</button>
+                                <button class="link_button " style="margin-right: 2rem;">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                `
+            )
+        }
+
+        updateFriendsHandlers();
+    } catch (err) {
+        console.log(err);
+    }
+
+    $("#findFriends").click(async function (el) {
+        el.preventDefault();
+
+        const currentValue = $("#friendInput").val();
+        if (currentValue != "") {
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: `/api/v1/users/search/${currentValue}`
+                });
+
+                if (res.status === 200) {
+                    const users = res.data.data;
+
+                    for (let i = 0; i < users.length; i++) {
+                        await $(".friendsSearchHolder").append(
+                            `
+                                <div class="friend_item" id="${users[i]._id}">
+                                    <div style="display: flex; align-items: center; justify-content: center; width: 12rem; height: 12rem; border-radius: 50%; overflow: hidden;">
+                                        <img src="/api/v1/file/${users[i].photoKey}" alt="" width="100%">
+                                    </div>
+                                    <div>
+                                        <p style="font-size: 1.8rem; margin-bottom: 1rem;">${users[i].name}</p>
+                                        <div>
+                                            <button class="link_button idAddUser" style="margin-right: 2rem;">Добавить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        )
+                    }
+
+                    $(".idAddUser").click(async function () {
+                        try {
+                            const res1 = await axios({
+                                method: 'POST',
+                                url: '/api/v1/friendLinks',
+                                data: {
+                                    user: this.parentNode.parentNode.parentNode.id
+                                }
+                            });
+
+                            if (res1.status === 204) {
+                                alert("Заявка в друзья отправлена!");
+                            }
+                        } catch (err) {
+                            alert("something went wrongehlo");
+                            console.log(err);
+                        }
+                    });
+                }
+            } catch (err) {
+                alert("wronghel");
+                console.log(err);
+            }
+        }
+    });
+
+    
+    // document.querySelector("#findFriends").addEventListener("click", function (el) {
+    //     el.preventDefault();
+    // });
 }
 
+const updateFriendsHandlers = async function() {
+    $(".idOpenChat").click(async function () {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/messenger'
+            });
+
+            if (res.status === 200) {
+                await $('body').empty().append(res.data);
+
+                messengerPageHandlers(this.parentNode.parentNode.parentNode.id);
+            }
+        } catch (err) {
+            alert("something went wrong");
+            console.log(err);
+        }
+    });
+};
+
+const messengerPageHandlers = async function(userid) {
+    let currentChat;
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/chats/loadChat/${userid}`
+        });
+    
+        if (res.status === 200) {
+            currentChat = res.data;
+            printMessages(currentChat._id);
+        }
+    } catch (err) {
+        alert("something went wrongelo");
+        console.log(err);
+    }
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/chats'
+        });
+
+        if (res.status == 200) {
+            for (let i = 0; i < res.data.length; i++) {
+                let otherUser;
+                if (res.data.user1._id === currentUser._id) otherUser = res.data.user2;
+                else otherUser = res.data.user1;
+                $("#chatsList").append(`
+                    <div class="ms_message_field">
+                        <div style="display: flex; align-items: center; gap: 2rem;">
+                            <div class="ms_message_avatar">
+                                <img src="/api/v1/file/${otherUser.photoKey}" alt="">
+                            </div>
+                            <div style="display: flex; flex-direction: column;">
+                                <p class="ms_message_name">${otherUser.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `);
+            }
+        }
+    } catch (err) {
+        alert("Something went wrong");
+        console.log(err);
+    }
+
+    $("#sendMessage").click(async function (el) {
+        el.preventDefault();
+        const messageContent = $("#messageInput").val();
+        $("#messageInput").val("");
+
+        if (messageContent) {
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/messages',
+                    data: {
+                        content: messageContent,
+                        type: 'Text',
+                        chat: currentChat._id
+                    }
+                });
+
+                if (res.status === 204) {
+                    printMessages(currentChat._id);
+                }
+            } catch (err) {
+                alert("something went wronghelo");
+                console.log(err);
+            }
+        }
+    });
+};
+
+const printMessages = async function(chatid) {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/chats/${chatid}`
+        });
+
+        if (res.status === 200) {
+            const messages = res.data.messages.reverse();
+            let otherUser;
+
+            if (res.data.user1._id === currentUser._id) otherUser = res.data.user2;
+            else otherUser = res.data.user1;
+
+            await $("#messagesHolder").empty();
+
+            for (let i = 0; i < messages.length; i++) {
+                if (messages[i].author === currentUser._id) {
+                    await $("#messagesHolder").append(
+                        `
+                            <div class="outcome_box" style="justify-content: right;">
+                                <div style="width: 40%; padding-top: 1rem;">
+                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                                    <div class="ms_message_box outcome" style="float: right; border-top-right-radius: 0;">
+                                        <p class="ms_message_content">${messages[i].content}</p>
+                                    </div>
+                                    
+                                </div>
+                                <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                    <img src="/api/v1/file/${currentUser.photoKey}" alt="">
+                                </div>
+                            </div>
+                        `
+                    );
+                }
+                else {
+                    await $("#messagesHolder").append(
+                        `
+                            <div class="income_box">
+                                <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                    <img src="/api/v1/file/${otherUser.photoKey}" alt="">
+                                </div>
+                                <div style="width: 40%; padding-top: 1rem;">
+                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${otherUser.name} - <span>8:40</span></p>
+                                    <div class="ms_message_box" style="border-top-left-radius: 0;">
+                                        <p class="ms_message_content">${messages[i].content}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    );
+                }
+            }
+            const mh = document.querySelector("#messagesHolder");
+            mh.scrollTo(0, mh.scrollHeight);
+        }
+    } catch (err) {
+        alert("Something went wrongelo");
+        console.log(err);
+    }
+}

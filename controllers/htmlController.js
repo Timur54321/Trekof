@@ -26,3 +26,16 @@ exports.getArtistPage = (req, res) => {
         }
     })
 };
+
+exports.getFriendsPage = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            html: HB.getFriendsPage()
+        }
+    });
+};
+
+exports.getMessengerPage = (req, res) => {
+    res.status(200).json(HB.getMessengerPage());
+}

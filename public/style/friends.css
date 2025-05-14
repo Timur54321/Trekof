@@ -1,0 +1,12 @@
+.friend_item {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.friend_item:hover {
+    background-color: #1b2527;
+}

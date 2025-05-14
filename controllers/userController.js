@@ -25,3 +25,19 @@ exports.getUser = async (req, res) => {
         data: user
     });
 };
+
+exports.findUsers = async (req, res) => {
+    const searchQuery = req.params.key;
+    const currentUserId = res.locals.user._id;
+
+    const users = await User.find({
+        name: {$regex: searchQuery, $options: 'i'},
+        _id: { $ne: currentUserId } 
+    });
+
+    res.status(200).json({
+        status: 'success',
+        data: users
+    });
+};
+

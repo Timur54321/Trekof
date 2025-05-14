@@ -2,22 +2,26 @@ const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema(
     {
-        messages: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'Message'
-            }
-        ],
-        userOne: {
+        user1: {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
         },
-        userTwo: {
+        user2: {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
         }
+    },
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
+
+chatSchema.virtual('messages', {
+    ref: 'Message',
+    localField: '_id',
+    foreignField: 'chat'
+});
 
 const Chat = mongoose.model('Chat', chatSchema);
 module.exports = Chat;

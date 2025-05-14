@@ -613,3 +613,92 @@ exports.getArtistPage = () => {
 
     `;
 }
+
+exports.getFriendsPage = () => {
+    return `
+        <div class="search_box">
+            <p class="search_title title_style">Поиск друзей</p>
+            <p class="search_info subtitle_style">Добавляйте людей в список своих друзей</p>
+            <form action="" class="search_bar_holder">
+                <input id="friendInput" type="text" placeholder="Найти друга..." class="search_bar">
+                <button class="search_button" id="findFriends">Найти</button>
+            </form>
+        </div>
+        <div class="friendsSearchHolder"></div>
+    `
+};
+
+exports.getMessengerPage = () => {
+    return `
+        <header class="ms_top_section">
+        <section class="ms_main_icon">
+            <img src="./data/icons/white_home.png" alt="mainlink_img">
+        </section>
+        <section style="padding: 2rem 4rem; display: flex; align-items: center; background-color: #242424; border-bottom: 0.1rem solid #888;">
+            <form action="" style="width: 100%;">
+                <input type="text" class="ms_find_user_input" placeholder="Поиск по имени...">
+            </form>
+        </section>
+        <section style="display: flex; align-items: center; padding-left: 4rem; background-color: #242424;">
+            <div class="ms_player">
+                <img src="./data/icons/moveLeft.png" alt="" style="width: 1.5rem;">
+                <img src="./data/icons/right.png" alt="" style="width: 2rem;">
+                <img src="./data/icons/moveRight.png" alt="" style="width: 1.5rem;">
+                <div class="ms_player_cover">
+                    <img src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="">
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <p style="font-size: 1.2rem;">аффект</p>
+                    <p style="color: #b9b9b9; margin-bottom: 0.8rem; font-size: 1.2rem;">Psychosis, godtearz, Апология</p>
+                    <div class="ms_progress_bar">
+                        <div class="ms_progress"></div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <img src="./data/icons/volume.png" alt="" style="width: 2rem;">
+                    <div class="ms_volume_bar">
+                        <div class="ms_volume"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </header>
+
+    <main class="ms_main_section">
+        <section style="display: flex; flex-direction: column; justify-content: center; background-color: #1b1b1b;">
+
+            <div class="ms_link_box">
+                <img src="./data/icons/white_email.png" alt="">
+            </div>
+
+            <div class="ms_link_box">
+                <img src="./data/icons/white_group.png" alt="">
+            </div>
+
+        </section>
+        <section style="overflow: scroll; background-color: #242424;" id="chatsList">          
+            
+        </section>
+
+        <section style="display: grid; grid-template-columns: 1fr;grid-template-rows: 1fr 10rem; min-height: 0; min-width: 0;">
+            
+            <section class="ms_messages_box" id="messagesHolder">
+                
+            </section>
+            
+            <section class="ms_message_input_box">
+                <form action="" style="width: 100%; display: flex; gap: 2rem; align-items: center;">
+                    <input type="text" placeholder="Напишите сообщение..." class="ms_message_input" id="messageInput">
+                    <button class="send_message" id="sendMessage">Отправить</button>
+                </form>
+            </section>
+
+        </section>
+
+        <section class="ms_mediafiles_section">
+
+            <p class="title_style" style="color: #eee; margin-bottom: 1.5rem;">Медиафайлы</p>
+
+        </section>
+    `;
+}

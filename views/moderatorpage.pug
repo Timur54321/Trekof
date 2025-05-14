@@ -16,22 +16,23 @@ block content
             .mod_right_bar
                 p.mod_title Заявки
                 each req in requests
-                    .request(id=req._id)
-                        .request_basic_info
-                            .request_date
-                                p= new Date(req.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                            .request_author
-                                div.default(style="width: 6rem; height: 6rem; overflow: hidden; border-radius: 50%;")
-                                    img(src=`/api/v1/file/${req.artist.photoKey}` alt="" width="100%")
-                                p= req.artist.name
-                            .request_player
-                                div#playsong(style="width: 3rem;")
-                                    img(src="/data/icons/pause.png" alt="" width="100%")
-                                .req_vol_bar
-                        
-                        .request_btns
-                            button#tocancel Отклонить
-                            button#toapprove Принять
+                    if req.status == "На рассмотрении"
+                        .request(id=req._id)
+                            .request_basic_info
+                                .request_date
+                                    p= new Date(req.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                                .request_author
+                                    div.default(style="width: 6rem; height: 6rem; overflow: hidden; border-radius: 50%;")
+                                        img(src=`/api/v1/file/${req.artist.photoKey}` alt="" width="100%")
+                                    p= req.artist.name
+                                .request_player
+                                    div#playsong(style="width: 3rem;")
+                                        img(src="/data/icons/pause.png" alt="" width="100%")
+                                    .req_vol_bar
+                            
+                            .request_btns
+                                button#tocancel Отклонить
+                                button#toapprove Принять
         .to_hide.dp_none#toreason
             .reason_overlay 
                 .reason_holder

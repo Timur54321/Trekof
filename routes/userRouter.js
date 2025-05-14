@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.get('/search/:key', authController.isLoggedIn, userController.findUsers);
 router.get('/me', authController.protect, userController.getMe);
 router.get('/:key', userController.getUser);
 router.patch('/:key', userController.updateUser);

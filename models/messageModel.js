@@ -7,11 +7,7 @@ const messageSchema = new mongoose.Schema(
             ref: 'User',
             required: [true, 'Не указан автор сообщения']
         },
-        content: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Content',
-            required: [true, 'Не указана ссылка на контент']
-        },
+        content: String,
         type: {
             type: String,
             enum: ['Text', 'Mediafile']
@@ -19,6 +15,10 @@ const messageSchema = new mongoose.Schema(
         mediafile: {
             type: mongoose.Schema.ObjectId,
             ref: 'MediaFile'
+        },
+        chat: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Chat'
         }
     }
 );

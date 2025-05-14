@@ -73,7 +73,7 @@ block content
                     p.top_menu_title Главная
                     .underline
 
-                .top_menu_item
+                .top_menu_item#friendsPage
                     p.top_menu_title Друзья
                     .underline.dp_none
                 if !user
@@ -237,6 +237,12 @@ block content
     .to_hide.dp_none#notbox
         .notification_overlay
             .not_box
+                each fl in friendLinks 
+                    if fl.status == "waiting"
+                        .not_item(id=fl._id)
+                            p.not_status= fl.user1.name
+                            button.link_button.acceptFriendRequest Добавить
+                            button.link_button.declineFriendRequest Отклонить
                 each request in requests
                     .not_item(id=request._id)
                         p.not_status #{request.mediaFile.name} &#183; 
