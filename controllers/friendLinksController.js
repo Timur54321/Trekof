@@ -40,6 +40,7 @@ exports.getMyFriends = async (req, res) => {
     let users = [];
     for (let i = 0; i < friendLinks.length; i++)
     {
+        if (friendLinks[i].status === "waiting") continue;
         if (friendLinks[i].user1._id.toString() == currentUserId)
         {
             users.push(friendLinks[i].user2);

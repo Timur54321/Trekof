@@ -163,7 +163,6 @@ const authorPageHandlers = async function() {
 ////////////////////////////////////////////////////////////////////////
 const artistPageHandlers = async artist => {
     let currentUser;
-    let currentTrack;
     try {
         const resUser = await axios({
             method: 'GET',
@@ -202,7 +201,7 @@ const artistPageHandlers = async artist => {
 
                                 <div style="display: flex; align-items: center; gap: 2.4rem;">
                                     <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
-                                    <img src="./data/icons/share.png" alt="" width="20rem">
+                                    <img src="./data/icons/share.png" alt="" width="20rem" class="shareTrack">
                                     <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
                                     <img class="threeDotsPlaylist" src="./data/icons/threedots.png" alt="" width="20rem">
                                     <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
@@ -352,6 +351,16 @@ $(document).ready(async function() {
         try {
             if (name && email && password && passwordConfirm)
             {
+
+                const fav = await axios({
+                    method: 'POST',
+                    url: '/api/v1/playlists',
+                    data: {
+                        name: 'Favourites',
+                        type: 'Favourites'
+                    }
+                });
+
                 const res = await axios({
                     method: 'POST',
                     url: '/api/v1/file/upload',
@@ -368,7 +377,8 @@ $(document).ready(async function() {
                             email,
                             password,
                             passwordConfirm,
-                            photoKey: res.data.data.key
+                            photoKey: res.data.data.key,
+                            favourites: fav.data._id
                         }
                     });
     
@@ -530,6 +540,7 @@ $(document).ready(async function() {
 
 
 const audioFileHandlers = () => {
+    let currentTrack;
     $(".likeTrack").click(async function () {
         if (currentUser)
         {
@@ -583,6 +594,71 @@ const audioFileHandlers = () => {
         }
     });
 
+    $(".shareTrack").click(async function() {
+        currentTrack = this.parentNode.parentNode.parentNode.id;
+        $("#shareChats").show(200);
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/chats/myChats'
+            });
+
+            if (res.status === 200) {
+                await $("#sendChatList").empty();
+                const chats = res.data;
+
+                for (let i = 0; i < chats.length; i++) {
+                    let otherUser;
+                    if (chats[i].user1._id === currentUser._id) otherUser = chats[i].user2;
+                    else otherUser = chats[i].user1;
+                    await $("#sendChatList").append(
+                        `
+                            <div class="chat_item" id="${chats[i]._id}">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 7rem; height: 7rem; border-radius: 1rem; overflow: hidden;">
+                                    <img src="/api/v1/file/${otherUser.photoKey}" alt="" width="100%">
+                                </div>
+                                <p class="not_status">${otherUser.name}</p>
+                            </div>
+                        `
+                    );
+                }
+            }
+        } catch (err) {
+            alert("COuld not load chats");
+            console.log(err);
+        }
+
+        $(".chat_item").click(async function() {
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/messages',
+                    data: {
+                        type: 'Mediafile',
+                        mediafile: currentTrack,
+                        author: currentUser._id,
+                        chat: this.id
+                    }
+                });
+
+                console.log(currentTrack);
+                console.log(res);
+                
+                if (res.status === 204) {
+                    alert("Аудиофайл отправлен этому челику");
+                }
+            } catch (err) {
+                alert("Tried to send audiofile to homie didnt work");
+                console.log(err);
+            }
+        });
+    });
+
+    $(".chatsOverlay").click(function(el) {
+        if ($(el.target)["0"] == this) {
+            $("#shareChats").hide(200);
+        }
+    });
 };
 
 const userPageHandlers = async function () {
@@ -624,17 +700,15 @@ const userPageHandlers = async function () {
             url: `/api/v1/playlists/tracks/${currentUser.favourites}`
         });
 
-        console.log(res.data);
-
         if (res.status === 200) {
             const favTracks = res.data;
             for (let i = 0; i < favTracks.length; i++) {
-                $("#usersFavourites").append(
+                await $("#usersFavourites").append(
                     `
                     <div class="music_box" data-index="4">
                         <div class="music_box_inner">
                             <div class="music_image_holder">
-                                <img src="/api/v1/flie/${favTracks[i].coverKey}" alt="">
+                                <img src="/api/v1/file/${favTracks[i].coverKey}" alt="">
                             </div>
                             <div class="music_info">
                                 <p class="music_name">${favTracks[i].name}</p>
@@ -653,6 +727,33 @@ const userPageHandlers = async function () {
         }
     } catch (err) {
         alert("Whatever");
+        console.log(err);
+    }
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/playlists/myPlaylists'
+        });
+
+        console.log(res.data);
+
+        if (res.status === 200) {
+            const playlists = res.data;
+            for (let i = 0; i < playlists.length; i++) {
+                $("#playlistsList").append(
+                    `
+                        <div class="widget_card">
+                            <div class="black_fade">
+                                <p class="widget_card_name">${playlists[i].name}</p>
+                            </div>
+                        </div>
+                    `
+                );
+            }
+        }
+    } catch (err) {
+        alert("Хотел вывести плейлисты но чет не пошло крч");
         console.log(err);
     }
 
@@ -786,7 +887,7 @@ const updateFriendsHandlers = async function() {
             });
 
             if (res.status === 200) {
-                await $('body').empty().append(res.data);
+                await $('.visibleParts').empty().append(res.data);
 
                 messengerPageHandlers(this.parentNode.parentNode.parentNode.id);
             }
@@ -799,6 +900,116 @@ const updateFriendsHandlers = async function() {
 
 const messengerPageHandlers = async function(userid) {
     let currentChat;
+    let updateChat;
+
+    if (currentUser.role === 'artist') {
+        await $("#chatsList").append(`
+             <button class="create_post" id="createPost">
+                <img src="./data/icons/plus.png" alt="" width="27rem">
+                <p style="font-size: 1.6rem; font-weight: 600;">Создать пост</p>
+            </button>
+            <div class="ms_message_field" id="loadChannel">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <div class="ms_message_avatar">
+                        <img src="./data/users/bf84a85797cba4df53b7c3341ca377a5.jpg" alt="">
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <p class="ms_message_name">Ваш канал</p>
+                    </div>
+                </div>
+            </div>
+            `)
+    }
+
+    $("#createPost").click(async function() {
+        clearInterval(updateChat);
+        await $("#messagesHolder").empty().append(`<div class="income_box">
+                    <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                        <img src="/api/v1/file/${currentUser.photoKey}" alt="">
+                    </div>
+                    <div style="width: 100%; padding-top: 1rem;">
+                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                        <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
+                            <div class="ms_post_pic" id="postPicture">
+                                <img src="./data/default_pic.jpg" alt="" id="img_cover">
+                            </div>
+
+                            <p style="font-size: 1.8rem; padding: 1rem 2rem; font-weight: 900;" id="postHeader">
+                                Заголовок
+                            </p>
+
+                            <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5;" id="postContent">
+                                Основной текст
+                            </p>
+                        </div>
+                    </div><input type="file" style="width: 0; " id="input_img" accept="image/png, image/jpeg">`);
+        await $("#messageInput").hide(100);
+        await $("#sendMessage").hide(100);
+        await $("#formCreationPost").prepend(`<textarea name="" id="post_creation_input"></textarea>`);
+        await $("#formCreationPost").prepend(`<textarea name="" id="post_creation_header"></textarea>`);
+        await $("#formCreationPost").append(`<button class="send_message" id="loadPost">Отправить</button>`);
+        let file;
+        $('#input_img').on('change', function(e) {
+            alert('whatever');
+            file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                $('#img_cover').attr('src', e.target.result);
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        $("#postPicture").click(function() {
+            $("#input_img").trigger("click");
+        });
+
+        $('#post_creation_input').on('input', function() {
+            $('#postContent').text($(this).val());
+        });
+        $('#post_creation_header').on('input', function() {
+            $('#postHeader').text($(this).val());
+        });
+        $("#loadPost").click(async function (e) {
+            e.preventDefault();
+            const formData = new FormData();
+            if (file)
+            {
+                formData.append('file', file);
+            }
+            else {
+                alert('Не выбран файл');
+                return;
+            }
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/file/upload',
+                    data: formData
+                });
+
+                const res1 = await axios({
+                    method: 'POST',
+                    url: '/api/v1/posts',
+                    data: {
+                        photoKey: res.data.data.key,
+                        header: $("#post_creation_header").val(),
+                        content: $("#post_creation_input").val(),
+                        channel: currentUser.channel
+                    }
+                });
+
+                if (res1.status === 204) {
+                    alert("Создали пост");
+                }
+            } catch (err) {
+                alert("Создание поста пошло не по плану");
+            }
+        })
+    });
 
     try {
         const res = await axios({
@@ -821,8 +1032,6 @@ const messengerPageHandlers = async function(userid) {
             url: '/api/v1/chats/myChats'
         });
 
-        console.log(res.data);
-
         if (res.status == 200) {
             for (let i = 0; i < res.data.length; i++) {
                 let otherUser;
@@ -839,8 +1048,14 @@ const messengerPageHandlers = async function(userid) {
                             </div>
                         </div>
                     </div>
-                    `);
+                `);
             }
+            updateChat = setInterval(() => {
+                if (currentChat)
+                {
+                    printMessages(currentChat._id);
+                }
+            }, 1000);
         }
     } catch (err) {
         alert("Something went wrong");
@@ -873,6 +1088,91 @@ const messengerPageHandlers = async function(userid) {
             }
         }
     });
+
+    $("#loadChannel").click(async function() {
+        clearInterval(updateChat);
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: `/api/v1/posts/${currentUser.channel}`
+            });
+
+            if (res.status === 200) {
+                const posts = res.data;
+
+                await $("#messagesHolder").empty();
+                for (let i = 0; i < posts.length; i++) {
+                    await $("#messagesHolder").append(`
+                            <div class="income_box">
+                                <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                    <img src="./data/12dcd2799b4e5ead1b94fe052ab30568.jpg" alt="">
+                                </div>
+                                <div style="width: 100%; padding-top: 1rem;">
+                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">godtearz - <span>8:40</span></p>
+                                    <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
+                                        <div class="ms_post_pic">
+                                            <img src="/api/v1/file/${posts[i].photoKey}" alt="">
+                                        </div>
+
+                                        <p style="font-size: 1.8rem; padding: 1rem 2rem; font-weight: 900;">
+                                            ${posts[i].header}
+                                        </p>
+
+                                        <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5;">
+                                            ${posts[i].content}
+                                        </p>
+
+                                        <div class="comment_btn">
+                                            <p><span>231</span> комментариев ---></p>
+                                        </div>
+
+                                        <div class="comment_section comment_gone">
+                                            <p style="font-size: 1.8rem; margin-bottom: 1rem;">Комментарии</p>
+
+                                            <div class="comment_box">
+                                                <div style="width: 3.4rem; height: 3.4rem; cursor: pointer; border-radius: 50%; overflow: hidden; display: flex; align-items: center; flex-shrink: 0;">
+                                                    <img src="./data/users/bf84a85797cba4df53b7c3341ca377a5.jpg" alt="" width="100%">
+                                                </div>
+                                                <div>
+                                                    <p style="font-size: 1.4rem;">Узник сартира - 12:45</p>
+                                                    <div class="comment_place">
+                                                        <p>Смотрите я не быдло, я в театр прише fasd fafd asл</p>
+                                                    </div>
+                                                    <div class="comment_place">
+                                                        <p>Где Америка находится лмао</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="comment_box">
+                                                <div style="width: 3.4rem; height: 3.4rem; cursor: pointer; border-radius: 50%; overflow: hidden; display: flex; align-items: center; flex-shrink: 0;">
+                                                    <img src="./data/users/ce8d6fed5b090a15cc5ec89f8d3862c4.jpg" alt="" width="100%">
+                                                </div>
+                                                <div>
+                                                    <p style="font-size: 1.4rem;">Альберт Эндшпиль - 12:45</p>
+                                                    <div class="comment_place">
+                                                        <p>За языком следи уважаемый</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        `)
+                }
+
+                $('.comment_btn').click(function() {
+                    $(this).next('.comment_section').toggleClass('comment_gone');
+                });
+            }
+        } catch (err) {
+            alert("was unable to load posts");
+            console.log(err);
+        }
+    });
 };
 
 const printMessages = async function(chatid) {
@@ -893,39 +1193,104 @@ const printMessages = async function(chatid) {
 
             for (let i = 0; i < messages.length; i++) {
                 if (messages[i].author === currentUser._id) {
-                    await $("#messagesHolder").append(
-                        `
+                    if (messages[i].type === "Mediafile") {
+                        await $("#messagesHolder").append(
+                            `
                             <div class="outcome_box" style="justify-content: right;">
-                                <div style="width: 40%; padding-top: 1rem;">
-                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
-                                    <div class="ms_message_box outcome" style="float: right; border-top-right-radius: 0;">
-                                        <p class="ms_message_content">${messages[i].content}</p>
+                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                                <div class="ath_song_card" style="float: right; width: 40rem; height: 20rem; margin-top: 1rem;">
+                                    <div class="ath_song_info">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div class="ath_snippet_play_btn" style="background-color: rgb(222, 222, 222); flex-shrink: 0; width: 3rem; height: 3rem;">
+                                                <img src="./data/icons/pause.png" alt="">
+                                            </div>
+                                            <p style="font-size: 1.4rem; line-height: 1.3; width: 120%; flex-shrink: 0; z-index: 100;">${messages[i].mediafile.name}</p>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div class="ath_card_artist_photo">
+                                                <img src="/api/v1/file/${messages[i].mediafile.artist.photoKey}" alt="">
+                                            </div>
+                                            <p style="color: rgb(194, 194, 194); font-size: 1.2rem;">${messages[i].mediafile.artist.name}</p>
+                                        </div>
                                     </div>
-                                    
+                                    <div class="ath_song_cover_box" style="background-image: url('/api/v1/file/${messages[i].mediafile.coverKey}');">
+                                        <div class="ath_black_gradient"></div>
+                                    </div>
                                 </div>
                                 <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
                                     <img src="/api/v1/file/${currentUser.photoKey}" alt="">
                                 </div>
-                            </div>
-                        `
-                    );
+                            </div>    
+                            `
+                        );
+                    }
+                    else {
+                        await $("#messagesHolder").append(
+                            `
+                                <div class="outcome_box" style="justify-content: right;">
+                                    <div style="width: 40%; padding-top: 1rem;">
+                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                                        <div class="ms_message_box outcome" style="float: right; border-top-right-radius: 0;">
+                                            <p class="ms_message_content">${messages[i].content}</p>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                        <img src="/api/v1/file/${currentUser.photoKey}" alt="">
+                                    </div>
+                                </div>
+                            `
+                        );
+                    }
                 }
                 else {
-                    await $("#messagesHolder").append(
-                        `
+                    if (messages[i].type === "Mediafile") {
+                        await $("#messagesHolder").append(
+                            `
                             <div class="income_box">
                                 <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
                                     <img src="/api/v1/file/${otherUser.photoKey}" alt="">
                                 </div>
-                                <div style="width: 40%; padding-top: 1rem;">
-                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${otherUser.name} - <span>8:40</span></p>
-                                    <div class="ms_message_box" style="border-top-left-radius: 0;">
-                                        <p class="ms_message_content">${messages[i].content}</p>
+                                <div class="ath_song_card" style="float: right; width: 40rem; height: 20rem; margin-top: 1rem;">
+                                    <div class="ath_song_info">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div class="ath_snippet_play_btn" style="background-color: rgb(222, 222, 222); flex-shrink: 0; width: 3rem; height: 3rem;">
+                                                <img src="./data/icons/pause.png" alt="">
+                                            </div>
+                                            <p style="font-size: 1.4rem; line-height: 1.3; width: 120%; flex-shrink: 0; z-index: 100;">${messages[i].mediafile.name}</p>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <div class="ath_card_artist_photo">
+                                                <img src="/api/v1/file/${messages[i].mediafile.artist.photoKey}" alt="">
+                                            </div>
+                                            <p style="color: rgb(194, 194, 194); font-size: 1.2rem;">${messages[i].mediafile.artist.name}</p>
+                                        </div>
+                                    </div>
+                                    <div class="ath_song_cover_box" style="background-image: url('/api/v1/file/${messages[i].mediafile.coverKey}');">
+                                        <div class="ath_black_gradient"></div>
                                     </div>
                                 </div>
                             </div>
-                        `
-                    );
+                            `
+                        );
+                    }
+                    else {
+                        await $("#messagesHolder").append(
+                            `
+                                <div class="income_box">
+                                    <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                        <img src="/api/v1/file/${otherUser.photoKey}" alt="">
+                                    </div>
+                                    <div style="width: 40%; padding-top: 1rem;">
+                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${otherUser.name} - <span>8:40</span></p>
+                                        <div class="ms_message_box" style="border-top-left-radius: 0;">
+                                            <p class="ms_message_content">${messages[i].content}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        );
+                    }
                 }
             }
             const mh = document.querySelector("#messagesHolder");

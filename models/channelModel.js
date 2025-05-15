@@ -2,24 +2,19 @@ const mongoose = require('mongoose');
 
 const channelSchema = new mongoose.Schema(
     {
-        name: {
-            type: String,
-            required: [true, 'Не указано имя канала']
-        },
-        followers: Number,
-        author: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User',
-            required: [true, 'Не указан автор канала']
-        },
-        posts: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'Post'
-            }
-        ]
+        followers: Number
+    },
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
+
+channelSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'channel'
+});
 
 const Channel = mongoose.model('Channel', channelSchema);
 module.exports = Channel;

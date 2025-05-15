@@ -34,4 +34,4 @@ exports.getPlaylistTracks = async (req, res) => {
         status: 'success',
         data: medafiles
     });
-}
+};

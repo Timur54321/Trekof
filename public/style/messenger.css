@@ -256,7 +256,7 @@
     background-color: #1b1b1b;
 }
 
-.ms_message_input, #post_creation_input {
+.ms_message_input, #post_creation_input, #post_creation_header {
     padding: 2rem;
     border-radius: 3rem;
     outline: none;
@@ -381,9 +381,3 @@
     margin: 2rem 3rem;
     cursor: pointer;
 }
-
-#post_creation_input {
-    
-}
-
-

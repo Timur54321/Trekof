@@ -85,7 +85,8 @@
 }
 
 .widget_cards_box {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem;
 }
 
@@ -482,7 +483,7 @@
     font-size: 1.4rem;
 }
 
-.notification_overlay, .reason_overlay, .playlist_overlay {
+.notification_overlay, .reason_overlay, .playlist_overlay, .chatsOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -522,3 +523,31 @@
     color: rgb(179, 179, 179);
     margin-bottom: 2rem;
 }
+
+.authorSearch  {
+    display: flex;
+    gap: 4rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.searchResultsHolder {
+    height: 70rem;
+    overflow: scroll;
+}
+
+.chat_item {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 1.8rem;
+}
+
+.chat_item:hover {
+    background-color: #1a2425;
+}
+
+

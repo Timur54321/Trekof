@@ -5,7 +5,8 @@ exports.createOne = async (req, res) => {
         author: res.locals.user,
         content: req.body.content,
         type: req.body.type,
-        chat: req.body.chat
+        chat: req.body.chat,
+        mediafile: req.body.mediafile
     });
 
     res.status(204).json(message);

@@ -2,18 +2,16 @@ const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema(
     {
-        photo: String,
+        photoKey: String,
+        header: String,
         content: {
             type: String,
             maxlength: 4000
         },
-        comments: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'Comment'
-            }
-        ],
-        likes: Number
+        channel: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Channel'
+        }
     }
 );
 

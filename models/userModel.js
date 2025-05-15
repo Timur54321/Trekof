@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.ObjectId,
             ref: "Playlist"
         },
+        channel: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Channel'
+        },
         followedChannels: [
             {
                 type: mongoose.Schema.ObjectId,

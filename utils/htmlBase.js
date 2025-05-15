@@ -253,77 +253,7 @@ exports.getUserPage = user => {
             <p class="recommendation_title title_style">Фавориты</p>
             <p class="recommendation_info subtitle_style">Добавляйте треки в свои фавориты</p>
             <div class="recommend_audio_box" id="usersFavourites">
-
-                <div class="music_box" data-index="1">
-                    <div class="music_box_inner">
-                        <div class="music_image_holder">
-                            <img src="./data/CRAZY.jpg" alt="">
-                        </div>
-                        <div class="music_info">
-                            <p class="music_name">CRAZY</p>
-                            <p class="music_author">LE SSERAFIM</p>
-                        </div>
-                    </div>
-
-                    <div class="music_box_inner">
-                        <p class="music_duration">2:44</p>
-                        <img src="./data/icons/more.png" alt="" class="add_music_icon">
-                    </div>
-                </div>
-
-                <div class="music_box" data-index="2">
-                    <div class="music_box_inner">
-                        <div class="music_image_holder">
-                            <img src="./data/ЗАСТРЕЛИЛИ.jpg" alt="">
-                        </div>
-                        <div class="music_info">
-                            <p class="music_name">Застрелили!</p>
-                            <p class="music_author">h1deki</p>
-                        </div>
-                    </div>
-
-                    <div class="music_box_inner">
-                        <p class="music_duration">2:58</p>
-                        <img src="./data/icons/more.png" alt="" class="add_music_icon">
-                    </div>
-                </div>
-
-                <div class="music_box" data-index="3">
-                    <div class="music_box_inner">
-                        <div class="music_image_holder">
-                            <img src="./data/ОНИУБИЛИКЕННИ.jpg" alt="">
-                        </div>
-                        <div class="music_info">
-                            <p class="music_name">Они убили Кенни!</p>
-                            <p class="music_author">saybyetome!</p>
-                        </div>
-                    </div>
-
-                    <div class="music_box_inner">
-                        <p class="music_duration">1:34</p>
-                        <img src="./data/icons/more.png" alt="" class="add_music_icon">
-                    </div>
-                </div>
-
-                <div class="music_box" data-index="4">
-                    <div class="music_box_inner">
-                        <div class="music_image_holder">
-                            <img src="./data/ЗАЯ.jpg" alt="">
-                        </div>
-                        <div class="music_info">
-                            <p class="music_name">зая</p>
-                            <p class="music_author">вчера, Мерси</p>
-                        </div>
-                    </div>
-
-                    <div class="music_box_inner">
-                        <p class="music_duration">1:35</p>
-                        <img src="./data/icons/more.png" alt="" class="add_music_icon">
-                    </div>
-                </div>
-
-                
-
+             
             </div>
         </div>
 
@@ -331,19 +261,8 @@ exports.getUserPage = user => {
 
             <p class="widget_title title_style">Плейлисты</p>
             <button class="link_button" style="margin-bottom: 2rem;" id="createPlaylist">Добавить</button>
-            <div class="widget_cards_box">
-                <div class="widget_card">
-                    <div class="black_fade">
-                        <p class="widget_card_name">Недавние</p>
-                        <p class="widget_card_info">saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi</p>
-                    </div>
-                </div>
-                <div class="widget_card">
-                    <div class="black_fade">
-                        <p class="widget_card_name">Недавние</p>
-                        <p class="widget_card_info">saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi</p>
-                    </div>
-                </div>
+            <div class="widget_cards_box" id="playlistsList">
+            
             </div>
             
         </div>
@@ -639,7 +558,7 @@ exports.getMessengerPage = () => {
             </section>
             
             <section class="ms_message_input_box">
-                <form action="" style="width: 100%; display: flex; gap: 2rem; align-items: center;">
+                <form action="" style="width: 100%; display: flex; gap: 2rem; align-items: center;" id="formCreationPost">
                     <input type="text" placeholder="Напишите сообщение..." class="ms_message_input" id="messageInput">
                     <button class="send_message" id="sendMessage">Отправить</button>
                 </form>

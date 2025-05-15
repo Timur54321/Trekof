@@ -12,6 +12,8 @@ const playlistRouter = require('./routes/playlistRouter');
 const friendLinksRouter = require('./routes/friendLinksRouter');
 const chatRouter = require('./routes/chatRouter');
 const messageRouter = require('./routes/messageRouter');
+const postRouter = require('./routes/postRouter');
+const channelRouter = require('./routes/channelRouter');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -31,5 +33,7 @@ app.use('/api/v1/playlists', playlistRouter);
 app.use('/api/v1/friendLinks', friendLinksRouter);
 app.use('/api/v1/chats', chatRouter);
 app.use('/api/v1/messages', messageRouter);
+app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/channels', channelRouter);
 
 module.exports = app;

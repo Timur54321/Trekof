@@ -32,7 +32,20 @@ exports.loadChat = async (req, res) => {
 };
 
 exports.getChat = async (req, res) => {
-    const chat = await Chat.findById(req.params.key).populate(['messages', 'user1', 'user2']);
+    const chat = await Chat.findById(req.params.key)
+    .populate('user1')
+    .populate('user2')
+    .populate({
+        path: 'messages',
+        populate: [
+            {
+                path: 'mediafile',
+                populate: {
+                    path: 'artist'
+                }
+            }
+        ]
+    });
 
     res.status(200).json(chat);
 };
