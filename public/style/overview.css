@@ -452,8 +452,8 @@
 }
 
 .album_cover {
-    width: 10rem; 
-    height: 10rem; 
+    width: 14rem; 
+    height: 14rem; 
     display: flex; 
     align-items: center; 
     overflow: hidden; 
@@ -462,7 +462,7 @@
 
 .album_name {
     font-size: 1.4rem; 
-    width: 100%; 
+    width: 14rem; 
     font-weight: 700; 
     line-height: 1.2; 
     margin-bottom: 0.6rem;
@@ -483,7 +483,7 @@
     font-size: 1.4rem;
 }
 
-.notification_overlay, .reason_overlay, .playlist_overlay, .chatsOverlay {
+.notification_overlay, .reason_overlay, .playlist_overlay, .chatsOverlay, .comment_overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -550,4 +550,23 @@
     background-color: #1a2425;
 }
 
+.searchAuthorItemBox {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding: 1.5rem 3rem;
+}
+
+.roleSelection {
+    padding: 2rem 3rem;
+    border-radius: 2rem;
+    background-color: unset;
+    border: solid 0.1rem white;
+    color: white;
+}
+
+.roleSelection option {
+    background-color: unset;
+    color: black;
+}
 

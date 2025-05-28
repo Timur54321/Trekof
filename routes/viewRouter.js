@@ -8,5 +8,6 @@ router.use(authController.isLoggedIn);
 
 router.get('/', viewController.getMainPage);
 router.get('/moderator', viewController.getModeratorPage);
+router.get('/admin', viewController.getAdminPage);
 
 module.exports = router;

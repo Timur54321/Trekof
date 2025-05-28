@@ -16,6 +16,10 @@ const playlistSchema = new mongoose.Schema(
         },
         type: String,
         mediafiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MediaFile' }]
+    },
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
 

@@ -16,8 +16,11 @@ const commentSchema = new mongoose.Schema(
             type: Date,
             default: Date.now
         },
-        likes: Number,
-        dislikes: Number
+        post: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Post',
+            requried: [true, 'Не указан пост']
+        }
     }
 );
 

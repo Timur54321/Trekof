@@ -29,6 +29,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = async (req, res) => {
+    console.log(req.body);
     const newUser = await User.create(req.body);
 
     createSendToken(newUser, 201, res);
@@ -56,6 +57,15 @@ exports.login = async (req, res, next) => {
     createSendToken(user, 200, res);
 };
 
+exports.logout = (req, res) => {
+    
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000 ),
+        httpOnly: true
+    });
+    res.status(200).json({status: 'success'});
+};
+
 exports.protect = async (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
@@ -73,7 +83,15 @@ exports.protect = async (req, res, next) => {
         });
     }
 
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+        decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return res.status(401).json({
+            status: 'failed',
+            message: 'jwt malformed'
+        });
+    }
 
     const freshUser = await User.findById(decoded.id);
     
@@ -101,7 +119,6 @@ exports.isLoggedIn = async (req, res, next) => {
             
             return next();
         } catch (err) {
-            console.log(err);
             return next();
         }
     }

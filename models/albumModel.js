@@ -17,15 +17,15 @@ const albumSchema = new mongoose.Schema(
                 ref: 'MediaFile'
             }
         ],
-        releaseDate: {
-            type: Date,
-            default: Date.now 
-        },
         cover: {
             type: String,
             required: [true, 'Не указан путь или URL к обложке албома']
         }
-    }
+    },
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }    
 );
 
 const Album = mongoose.model('Album', albumSchema);

@@ -25,7 +25,14 @@ const mediaFileSchema = new mongoose.Schema(
         },
         status: String,
         snippetStartTime: String,
-        text: String
+        text: String,
+        likes: Number,
+        shares: Number,
+        listens: Number,
+        date: {
+            type: Date,
+            default: Date.now
+        },
     }
 );
 

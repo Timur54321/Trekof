@@ -1,4 +1,5 @@
 const Playlist = require('../models/playlistModel');
+const MediaFile = require('../models/mediaFileModel');
 
 exports.createOne = async (req, res) => {
     const playlist = await Playlist.create(req.body);
@@ -18,13 +19,20 @@ exports.getPlaylistOfUser = async (req, res) => {
 exports.addTrack = async (req, res) => {
     const playlistId = req.params.key;
 
-    const playlists = await Playlist.findByIdAndUpdate(
+    const playlist = await Playlist.findByIdAndUpdate(
         playlistId, // ID плейлиста
         { $push: { mediafiles: req.body.audioFileId } }, // audiofileId - ObjectId аудиофайла
         { new: true } // Вернуть обновленный документ
     );
+
+    if (playlist.type === "Favourites") {
+        await MediaFile.findByIdAndUpdate(
+            req.body.audioFileId, // ID медиафайла
+            { $inc: { likes: 1 } } // Увеличить likes на 1
+        );
+    }
     
-    res.status(200).json(playlists);
+    res.status(200).json(playlist);
 };
 
 exports.getTracks = async (req, res) => {

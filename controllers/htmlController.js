@@ -38,4 +38,12 @@ exports.getFriendsPage = (req, res) => {
 
 exports.getMessengerPage = (req, res) => {
     res.status(200).json(HB.getMessengerPage());
+};
+
+exports.getMainPage = (req, res) => {
+    res.status(200).json(HB.getMainPage());
+};
+
+exports.getLeftSection = (req, res) => {
+    res.status(200).json(HB.getLeftSection());
 }

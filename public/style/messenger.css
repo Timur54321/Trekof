@@ -15,6 +15,7 @@
     align-items: center;
     justify-content: center;
     background-color: #1b1b1b;
+    cursor: pointer;
 }
 
 .ms_main_icon img {
@@ -57,7 +58,7 @@
 }
 
 .ms_progress_bar, .ms_volume_bar {
-    width: 24rem;
+    width: 24rem!important;
     height: 0.4rem;
     background-color: rgb(145, 145, 145);
     border-radius: 2rem;
@@ -65,7 +66,7 @@
 }
 
 .ms_volume_bar {
-    width: 8rem;
+    width: 8rem!important;
 }
 
 .ms_progress, .ms_volume {
@@ -280,9 +281,13 @@
     position: relative;
     overflow: visible;
 }
-.ms_post * {
-    z-index: 5;
-}
+
+ .chatsListTitle {
+    font-size: 1.8rem;
+    color: white;
+    margin-left: 3rem;
+    margin-top: 3rem;
+ }
 
 .ms_post_pic {
     width: 100%;
@@ -330,44 +335,6 @@
     border-bottom-left-radius: 2rem;
 }
 
-.comment_section {
-    width: 90%;
-    height: 70rem;
-    border: solid 0.2rem white;
-    border-left: none;
-    position: absolute;
-    left: 100%;
-    bottom: 0;
-    border-top-right-radius: 2rem;
-    border-bottom-right-radius: 2rem;
-    padding: 1rem 2rem;
-    overflow-y: scroll;
-    opacity: 1;
-    transition: opacity 0.3s, transform 0.5s;
-    z-index: 2;
-}
-
-.comment_box {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.comment_place {
-    background-color: #298d62;
-    padding: 1rem 1.5rem;
-    font-size: 1.2rem;
-    width: fit-content;
-    border-radius: 1rem;
-    border-top-left-radius: 0;
-    margin-top: 0.6rem;
-}
-
-.comment_gone {
-    opacity: 0;
-    transform: translateY(50%) translateX(-100%) scale(0);
-}
-
 .create_post {
     width: 20rem;
     height: 5rem;
@@ -380,4 +347,31 @@
     gap: 2rem;
     margin: 2rem 3rem;
     cursor: pointer;
+}
+
+
+
+.comment_box {
+    width: 100rem;
+    height: 70rem;
+    background-color: #171F21;
+    z-index: 100;
+    border-radius: 4rem;
+    padding: 5rem;
+}
+
+.comment_section {
+    display: grid;
+    height: 100%;
+    grid-template-rows: minmax(0, 10fr) minmax(0, 1fr);
+    padding-bottom: 2rem;
+    gap: 2rem;
+}
+
+.comment_input_box {
+    background-color: unset;
+}
+
+.comment_message_input {
+    background-color: unset;
 }

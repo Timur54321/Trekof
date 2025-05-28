@@ -9,7 +9,7 @@ block content
 
                 .left_section_menus
                     .audio_hosting_menu
-                        .hosting_menu_item.hover_effect
+                        .hosting_menu_item.hover_effect#mainPage
                             .active_hosting_page
                             img.hosting_image(src="/data/icons/home.png", alt="")
                             p.hosting_menu_text Главная
@@ -17,14 +17,6 @@ block content
                             .active_hosting_page.hidden
                             img.hosting_image(src="/data/icons/user.png", alt="")
                             p.hosting_menu_text Профиль
-                        .hosting_menu_item.hover_effect
-                            .active_hosting_page.hidden
-                            img.hosting_image(src="/data/icons/star.png", alt="")
-                            p.hosting_menu_text Фавориты
-                        .hosting_menu_item.hover_effect
-                            .active_hosting_page.hidden
-                            img.hosting_image(src="/data/icons/rock-guitar.png", alt="")
-                            p.hosting_menu_text Жанры
 
                     .messenger_menu
                         .hosting_menu_item(style="padding-top: 0;")
@@ -58,19 +50,14 @@ block content
                             img.togo_management_icon(src="/data/icons/yellow_next.png", alt="")
 
                         .stats_container
-                            .stats_holder
+                            .stats_holder#openStatistic
                                 img(src="/data/icons/loading.png", alt="")
                                 .stats_box
                                     p.stat_title Статистика
                                     p.stat_info Ваши треки и альбомы
-                            .stats_holder
-                                img(src="/data/icons/checkmark.png", alt="")
-                                .stats_box
-                                    p.stat_title Релизы
-                                    p.stat_info Ваши треки и альбомы
             section.right_section 
                 header.top_menu_bar
-                    .top_menu_item
+                    .top_menu_item#mainPageLink
                         p.top_menu_title Главная
                         .underline
 
@@ -83,6 +70,7 @@ block content
                     if user 
                         .default#notifications(style="cursor: pointer; width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 50%; border: 0.1rem solid rgb(116, 116, 116)")
                             img(src="/data/icons/notification.png" alt="" width="50%")
+                        button.link_button#logout Выйти
                 section.main_section
                     section.middle_part
                         .authors_box
@@ -91,7 +79,7 @@ block content
                                 img.authors_link(src="./data/icons/pink_next.png", alt="")
                             p.genres_title.subtitle_style Ислледуйте новые жанры
 
-                            .authors_list_box
+                            .authors_list_box#topArtistsList
                                 each author in authors
                                     .author_holder.artisto(id=author._id)
                                         .author_image_holder
@@ -135,34 +123,13 @@ block content
                                         p.music_duration 2:58
                                         img.add_music_icon(src="./data/icons/more.png", alt="")
 
-                                .music_box(data-index="3")
-                                    .music_box_inner
-                                        .music_image_holder
-                                            img(src="./data/ОНИУБИЛИКЕННИ.jpg", alt="")
-                                        .music_info
-                                            p.music_name Они убили Кенни!
-                                            p.music_author saybyetome!
-                                    .music_box_inner
-                                        p.music_duration 1:34
-                                        img.add_music_icon(src="./data/icons/more.png", alt="")
-
-                                .music_box(data-index="4")
-                                    .music_box_inner
-                                        .music_image_holder
-                                            img(src="./data/ЗАЯ.jpg", alt="")
-                                        .music_info
-                                            p.music_name зая
-                                            p.music_author вчера, Мерси
-                                    .music_box_inner
-                                        p.music_duration 1:35
-                                        img.add_music_icon(src="./data/icons/more.png", alt="")
                     section.right_part
                         .search_box
                             p.search_title.title_style Поиск
                             p.search_info.subtitle_style Более 1000+ композиций
                             form.search_bar_holder(action="")
-                                input.search_bar(type="text", placeholder="Любимые исполнители...")
-                                button.search_button Найти
+                                input.search_bar.searchInput(type="text", placeholder="Любимые исполнители...")
+                                button.search_button.searchBtn Найти
 
                         .messenger_box
                             p.messenger_box_title.title_style 4 000+ пользователей уже на платформе
@@ -188,8 +155,8 @@ block content
                                             p.music_player_name грааль
                                             p.music_player_author Psychosis
                                         div
-                                            img.share_button(src="./data/icons/share.png", alt="")
-                                            img(src="./data/icons/more.png", alt="")
+                                            img.share_button.shareTrack(src="./data/icons/share.png", alt="")
+                                            img.likeTrack(src="./data/icons/more.png", alt="")
                                     .progress_bar
                                         .progress
                                     .music_player_duration_box
@@ -233,6 +200,9 @@ block content
                     div
                         p Подтвердите пароль
                         input#regpasswordconfirm(type="password" style="margin-bottom: 2rem;")
+                    select#regUserRole.roleSelection
+                        option(value="user") Пользователь
+                        option(value="artist") Исполнитель
                 .default(style="justify-content: end;")
                     button.link_button#signup Отправить
     .to_hide.dp_none#notbox
@@ -257,10 +227,10 @@ block content
                             p.not_info Ваш трек находится в рассмотрении
                         if request.status == "Одобрено"
                             p.not_info Ваш трек был загружен на платформу, вы можете увидеть его у себя в профиле
-                            button.link_button#delapprovereq ок
+                            button.link_button.delapprovereq ок
                         if request.status == "Отклонено"
                             p.not_info= request.reason
-                            button.link_button#delcancelreq ок
+                            button.link_button.delcancelreq ок
     .to_hide.dp_none#playlistbox 
         .playlist_overlay 
             .not_box#wadehell
@@ -274,4 +244,18 @@ block content
                     div(style="display: flex; align-items: center; justify-content: center; width: 7rem; height: 7rem; border-radius: 1rem; overflow: hidden;")
                         img(src="./data/1a5ed333e66d05243a0460364d5108de.jpg", alt="", width="100%")
                     p.not_status Алкаш
+    
+    .to_hide.dp_none#albumCreationBox
+        .albumTracksOverlay
+            .alb_tracks_box
+                .albumFormBox 
+                    div(style="width: 10rem; height: 10rem; border-radius: 50%; border: solid 0.1rem white; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 1rem; background-size: 100% auto; background-position: center; background-repeat: no-repeat;" id="albumCoverImg")
+                        img(src="./data/icons/cover_img.png", alt="" width="50%" id="albCover")
+                    input.search_bar(type="text" placeholder="Введите имя альбома..." style="border: solid 0.1rem white;" id="albumNameInput")
+                    input(type='file' style="display: none;" id="albumCoverInput")
+                div(style="overflow-y: scroll;" id="albumAddTracks")
+                    
+                div
+                    button.link_button#uploadAlbum Создать
+    
     input#regpic(type="file" style="display: none;")

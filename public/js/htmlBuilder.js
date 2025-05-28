@@ -1,5 +1,180 @@
+import { loadMusic, playMusic, togglePlay, setProgressBar, setSoundBar, checkPlaying } from './audio.js';
+
+let currentUser;
+let currentCover, currentPlayingTrack, currentAuthor, currentTrackId;
+
+const updateAlbumsList = async function(artistId) {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/albums/artist/${artistId}`
+        });
+
+        if (res.status === 200) {
+            await $('#albums_list').children().not(':first').remove();
+            const albums = res.data;
+
+            for (let i = 0; i < albums.length; i++) {
+                await $("#albums_list").append(`
+                    <div style="width: 24rem; display: flex; flex-direction: column; gap: 1.6rem;"id="${albums[i]._id}">
+                        <div class="album_cover loadAlbumTracks" style="cursor: pointer;" >
+                            <img width="100%" src="/api/v1/file/${albums[i].cover}" alt="">
+                        </div>
+                        <div>
+                            <p class="album_name">${albums[i].name}</p>
+                            <p class="item_type">Альбом</p>
+                            ${currentUser._id === artistId ? `<div class="putInCenter deleteAlbum" style="width: 3rem; height: 3rem; cursor: pointer;" >
+                                <img src="./data/icons/delete.png" alt="" width="100%">
+                            </div>` : ""}
+                            
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+const loadMainPage = async function() {
+    try {
+        const res = await axios({
+            method: "GET",
+            url: '/api/v1/html/mainPage'
+        });
+
+        let rs = $(".right_section");
+        rs.empty();
+        await rs.append(res.data);
+
+        if (!currentUser) {
+            $("#friendsPage").after(`<button class="link_button" id="createaccbtn" style="width: 30rem; flex-shrink: 0;">Создать аккаунт</button>
+    <button class="link_button" id="loginbtn" style="width: 30rem; flex-shrink: 0;">Войти</button>`);
+        } else {
+            $("#friendsPage").after(`<div class="default" id="notifications" style="cursor: pointer; width: 4rem; height: 4rem; flex-shrink: 0; border-radius: 50%; border: 0.1rem solid rgb(116, 116, 116)">
+        <img src="/data/icons/notification.png" alt="" width="50%">
+    </div>
+    <button class="link_button" id="logout">Выйти</button>`);
+        }
+        
+        const res1 = await axios({
+            method: 'GET',
+            url: '/api/v1/users/getAuthors'
+        });
+
+        const artists = res1.data;
+        const element = $("#topArtistsList");
+        for (let i = 0; i < artists.length; i++) {
+            await element.append(`
+                <div class="author_holder artisto" id="${artists[i]._id}">
+                    <div class="author_image_holder">
+                        <img src="/api/v1/file/${artists[i].photoKey}" alt="">
+                    </div>
+                </div>
+            `);
+        }
+
+        mainPageHandlers();
+        topMenuHandlers();
+        audioFileHandlers();
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const audioHostingHandlers = function () {
+    $("#profile").click(async () => {
+        if (currentUser)
+        {
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: '/api/v1/html/userPage'
+                });
+
+                if (res.status === 200) {
+                    let mp = $(".middle_part");
+                    mp.empty();
+                    await mp.append(res.data.data.html);
+
+                    userPageHandlers();
+                }
+            } catch (err) {
+                alert("Something went catastrofically wrongelo");
+                console.log(err);
+            }
+        }
+        else {
+            
+        }
+    });
+
+    $("#mainPage").click(async function() {
+        loadMainPage();
+    });
+
+    $("#openStatistic").click(async function() {
+        $(".middle_part").empty();
+        try {
+            const res = await axios({
+                method: "GET",
+                url: `/api/v1/mediafiles/${currentUser._id}`
+            });
+
+            const mediafiles = res.data.data;
+            $(".middle_part").append(`<p class="title_style" style="margin-bottom: 4rem;">Ваши треки</p>
+                `)
+            for (let i = 0; i < mediafiles.length; i++) {
+                $(".middle_part").append(`
+                    <div class="trackStatItem">
+                            <div class="statTrackBasicInfo">
+                                <div class="putInCenter" style="width: 8rem; height: 8rem; border-radius: 1.8rem; overflow: hidden; ">
+                                    <img src="/api/v1/file/${mediafiles[i].coverKey}" alt="" width="100%">
+                                </div>
+                                <div>
+                                    <p class="statTrackName">${mediafiles[i].name}</p>
+                                    <p class="statTrackUploadDate">${mediafiles[i].date}</p>
+                                </div>
+                            </div>
+                            <div class="statInformation">
+                                <div class="statItemHolder">
+                                    <div class="putInCenter" style="width: 4rem; height: 4rem; border-radius: 1.8rem; overflow: hidden; ">
+                                        <img src="./data/icons/like.png" alt="" width="70%">
+                                    </div>
+                                    <p style="font-size: 1.4rem;">
+                                        ${mediafiles[i].likes || "0"}
+                                    </p>
+                                </div>
+                                <div class="statItemHolder">
+                                    <div class="putInCenter" style="width: 4rem; height: 4rem; border-radius: 1.8rem; overflow: hidden; ">
+                                        <img src="./data/icons/headphones.png" alt="" width="70%">
+                                    </div>
+                                    <p style="font-size: 1.4rem;">
+                                        ${mediafiles[i].listens || '0'}
+                                    </p>
+                                </div>
+                                <div class="statItemHolder">
+                                    <div class="putInCenter" style="width: 4rem; height: 4rem; border-radius: 1.8rem; overflow: hidden; ">
+                                        <img src="./data/icons/share.png" alt="" width="70%">
+                                    </div>
+                                    <p style="font-size: 1.4rem;">
+                                        ${mediafiles[i].shares || '0'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+};
+
 const authorPageHandlers = async function() {
-    let currentUser;
+    let currentUser, chosenAlbumTracks;
     try {
         const res = await axios({
             method: 'GET',
@@ -15,31 +190,7 @@ const authorPageHandlers = async function() {
         });
 
         if (res1.status === 200) {
-            for (let i = 0; i < res1.data.data.length; i++) {
-                $("#tracksHolder").append(
-                    `
-                        <div class="track">
-                            <div class="track_item">
-
-                                <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                    <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
-                                        <img src="/api/v1/file/${res1.data.data[i].coverKey}" alt="" width="100%">
-                                    </div>
-                                    <p style="font-size: 2rem;">${res1.data.data[i].name}</p>
-                                </div>
-
-                                <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                    <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
-                                    <img src="./data/icons/share.png" alt="" width="20rem">
-                                    <img src="./data/icons/more.png" alt="" width="20rem">
-                                    <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
-                                </div>
-
-                            </div>
-                        </div>
-                    `
-                )
-            }
+            printPlaylistTracks(res1.data.data);
         }
         currentUser = res.data;
 
@@ -47,6 +198,9 @@ const authorPageHandlers = async function() {
     {
         console.log(err);
     }
+
+    await updateAlbumsList(currentUser._id);
+    albumsHandlers();
 
     $("#upload_track").click(() => {
         $("#upload_hide").show(200);
@@ -124,8 +278,8 @@ const authorPageHandlers = async function() {
                     data: {
                         name: trackName,
                         artist: currentUser._id,
-                        coverKey: res1.data.data.key,
-                        audioKey: res2.data.data.key,
+                        coverKey: res1.data.data.Key,
+                        audioKey: res2.data.data.Key,
                         status: 'checking',
                         text: trackText
                     }
@@ -133,8 +287,6 @@ const authorPageHandlers = async function() {
 
                 if (res3)
                 {
-                    console.log(res3);
-
                     const res4 = await axios({
                         method: 'POST',
                         url: '/api/v1/requests',
@@ -158,7 +310,215 @@ const authorPageHandlers = async function() {
             console.log(err);
         }
     });
+
+    $("#createAlbum").click(async function() {
+        $("#albumCreationBox").show(200);
+
+        try {
+            const res = await axios({
+                method: "GET",
+                url: `/api/v1/mediafiles/${currentUser._id}`
+            });
+
+            if (res.status === 200) {
+                const tracks = res.data.data;
+                chosenAlbumTracks = new Set();
+                await $("#albumAddTracks").empty();
+                for (let i = 0; i < tracks.length; i++) {
+                    $("#albumAddTracks").append(`
+                            <div class="alb_track_item" id="${tracks[i]._id}">
+                                <div style="display: flex; align-items: center; gap: 4rem;">
+                                    <div style="width: 5rem; height: 5rem; display: flex; align-items: center; justify-self: center; overflow: hidden; border-radius: 0.7rem;">
+                                        <img src="/api/v1/file/${tracks[i].coverKey}" alt="" width="100%">
+                                    </div>
+                                    <p style="font-size: 1.6rem;">${tracks[i].name}</p>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center; width: 5rem; height: 5rem;">
+                                    <img src="./data/icons/more.png" alt="" width="50%" class="addTrackToAlbumIndex" data-added="0">
+                                </div>
+                            </div>
+                        `);
+                }
+
+                $(".addTrackToAlbumIndex").click(function() {
+                    if (this.dataset.added === "1")
+                    {
+                        $(this).attr('src', './data/icons/more.png');
+                        this.dataset.added = "0";
+                        chosenAlbumTracks.delete(this.parentNode.parentNode.id);
+                    }
+                    else {
+                        $(this).attr('src', './data/icons/checked.png');
+                        this.dataset.added = "1";
+                        chosenAlbumTracks.add(this.parentNode.parentNode.id);
+                    }
+                    
+                });
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    $(".albumTracksOverlay").click(function(el) {
+        if ($(el.target)["0"] == this) {
+            $("#albumCreationBox").hide(200);
+            if (chosenAlbumTracks)
+            {
+                chosenAlbumTracks.clear();
+            }        
+        }
+    });
+
+    $("#uploadAlbum").click(async function() {
+        const name = $("#albumNameInput").val();
+        const file = $("#albumCoverInput")[0].files[0];
+        const formData = new FormData();
+
+        if (file)
+        {
+            formData.append('file', file);
+        }
+        try {
+            if (name)
+            {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/file/upload',
+                    data: formData
+                });
+    
+                if (res.data.data.key) 
+                {
+                    const res1 = await axios({
+                        method: 'POST',
+                        url: '/api/v1/albums',
+                        data: {
+                            name, 
+                            cover: res.data.data.key,
+                            mediafiles: Array.from(chosenAlbumTracks)
+                        }
+                    });
+    
+                    if (res1.status == 201)
+                    {
+                        alert("Альбом был жестоко создан");
+                        chosenAlbumTracks.clear();
+                        $("#albumCreationBox").hide(200);
+                        await updateAlbumsList(currentUser._id);
+                        albumsHandlers();
+                    }
+                }
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    $("#albumCoverImg").click(function() {
+        $("#albumCoverInput").trigger('click');
+    });
+
+    $("#albumCoverInput").on('change', function() {
+        const file = this.files[0];
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            $("#albumCoverImg").css({
+                'background-image': 'url(' + e.target.result + ')',
+                'background-size:': '100% auto'
+            });
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    audioFileHandlers();
 };
+
+const albumsHandlers = function() {
+    $(".loadAlbumTracks").off('click').click(async function() {
+        try {
+            const res = await axios({
+                method: "GET",
+                url: `/api/v1/mediafiles/album/${this.parentNode.id}`
+            });
+
+            if (res.status == 200) {
+                await $("#tracksHolder").empty();
+                await $("#tracksHolder").append('<button class="link_button" id="albumsListBack">Назад</button>');
+                console.log(res.data);
+                await printPlaylistTracks(res.data);
+                audioFileHandlers();
+
+                $("#albumsListBack").click(async function() {
+                    try {
+                        const res1 = await axios({
+                            method: 'GET',
+                            url: `/api/v1/mediafiles/${currentUser._id}`
+                        });
+                        
+                        if (res1.status === 200) {
+                            await $("#tracksHolder").empty();
+                            await printPlaylistTracks(res1.data.data);
+                            audioFileHandlers();
+                        }
+                    } catch (err) {
+                        console.log(err);
+                    }
+                })
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    $(".deleteAlbum").click(async function() {
+        try {
+            const res = await axios({
+                method: 'DELETE',
+                url: `/api/v1/albums/${this.parentNode.parentNode.id}`,
+            });
+
+            if (res.status === 203) {
+                await updateAlbumsList(currentUser._id);
+                albumsHandlers();
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+}
+
+const printPlaylistTracks = async (tracks) => {
+    for (let i = 0; i < tracks.length; i++) {
+        await $("#tracksHolder").append(
+            `
+                <div class="track" id="${tracks[i]._id}" data-key="${tracks[i].audioKey}" data-cover="${tracks[i].coverKey}" data-authorname="${tracks[i].artist.name}" data-trackname="${tracks[i].name}">
+                    <div class="track_item">
+
+                        <div style="display: flex; align-items: center; gap: 2.4rem;">
+                            <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
+                                <img src="/api/v1/file/${tracks[i].coverKey}" alt="" width="100%">
+                            </div>
+                            <p style="font-size: 2rem;">${tracks[i].name}</p>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 2.4rem;">
+                            <p style="font-size: 1.4rem; color: #ccc;">${tracks[i].artist.name}</p>
+                            <img src="./data/icons/share.png" alt="" width="20rem" class="shareTrack">
+                            <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
+                            <img class="threeDotsPlaylist" src="./data/icons/threedots.png" alt="" width="20rem">
+                            <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
+                        </div>
+
+                    </div>
+                </div>
+            `
+        )
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////
 const artistPageHandlers = async artist => {
@@ -178,6 +538,7 @@ const artistPageHandlers = async artist => {
         if (res.status === 200) {
             $("#authorprofilepic").attr("src", `/api/v1/file/${res.data.data.photoKey}`);
             $("#authorprofilename").text(res.data.data.name);
+            $(".channelLink").attr("id", res.data.data.channel);
         }
 
         const res1 = await axios({
@@ -186,32 +547,7 @@ const artistPageHandlers = async artist => {
         });
 
         if (res1.status === 200) {
-            for (let i = 0; i < res1.data.data.length; i++) {
-                await $("#tracksHolder").append(
-                    `
-                        <div class="track" id="${res1.data.data[i]._id}">
-                            <div class="track_item">
-
-                                <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                    <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
-                                        <img src="/api/v1/file/${res1.data.data[i].coverKey}" alt="" width="100%">
-                                    </div>
-                                    <p style="font-size: 2rem;">${res1.data.data[i].name}</p>
-                                </div>
-
-                                <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                    <p style="font-size: 1.4rem; color: #ccc;">${res1.data.data[i].artist.name}</p>
-                                    <img src="./data/icons/share.png" alt="" width="20rem" class="shareTrack">
-                                    <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
-                                    <img class="threeDotsPlaylist" src="./data/icons/threedots.png" alt="" width="20rem">
-                                    <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
-                                </div>
-
-                            </div>
-                        </div>
-                    `
-                )
-            }
+            await printPlaylistTracks(res1.data.data);
         }
 
         let myPlaylists = await axios({
@@ -235,66 +571,67 @@ const artistPageHandlers = async artist => {
         console.log(err);
     }
 
+    $(".channelLink").click(async function() {
+        if (!currentUser.followedChannels.some(el => el === this.id)) {
+            let isSubscribed = confirm("Для просмотра канала вы должны на него подписаться! Подписаться на канал?");
+
+            if (isSubscribed) {
+                try {
+                    const res = await axios({
+                        method: 'PATCH',
+                        url: `/api/v1/users/addChannel/${currentUser._id}`,
+                        data: {
+                            channel: this.id
+                        }
+                    });
+
+                    if (res.status === 200) {
+                        alert("Неплохо так подписался на канал!");
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+            else {
+                return;
+            }
+        }
+
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/messenger'
+            });
+
+            if (res.status === 200) {
+                await $('.visibleParts').empty().append(res.data);
+
+                messengerPageHandlers(null, this.id);
+                audioFileHandlers();
+            }
+        } catch (err) {
+            alert("something went wrong");
+            console.log(err);
+        }
+
+    });
+
     audioFileHandlers();
 };
 
-let currentUser;
-$(document).ready(async function() {
-    try {
-        const res = await axios({
-            method: 'GET',
-            url: '/api/v1/users/me'
-        });
+const mainPageHandlers = function() {
+    $("#logout").click(async function() {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/users/logout'
+            });
 
-        currentUser = res.data;
-
-    } catch (err)
-    {
-        console.log(err);
-    }
-
-    $("#profile").click(async () => {
-        if (currentUser?.role === "user")
-        {
-            try {
-                const res = await axios({
-                    method: 'GET',
-                    url: '/api/v1/html/userPage'
-                });
-
-                if (res.status === 200) {
-                    let mp = $(".middle_part");
-                    mp.empty();
-                    await mp.append(res.data.data.html);
-
-                    userPageHandlers();
-                }
-            } catch (err) {
-                alert("Something went catastrofically wrongelo");
-                console.log(err);
+            if (res.status === 200) {
+                window.location.reload();
             }
-        }
-        else {
-            try {
-                const res = await axios({
-                    method: 'GET',
-                    url: '/api/v1/html/authorPage'
-                });
-            
-                let rs = $(".right_section");
-                rs.empty();
-                await rs.append(res.data.data.html);
-    
-                authorPageHandlers();
-            } catch (err) 
-            {
-                if (err.response.status == 401)
-                {
-                    alert("Необходимо авторизоваться!");
-    
-                    $("#tologin").show(200);
-                }
-            }
+        } catch (err) {
+            console.log(err);
         }
     });
 
@@ -336,11 +673,12 @@ $(document).ready(async function() {
         }
     });
 
-    $("#signup")?.click(async function() {
+    $("#signup").click(async function() {
         const name = $("#regname")?.val();
         const email = $("#regemail")?.val();
         const password = $("#regpassword")?.val();
         const passwordConfirm = $("#regpasswordconfirm")?.val();
+        const role = $("#regUserRole").val();
         const file = $("#regpic")[0].files[0];
         const formData = new FormData();
 
@@ -349,8 +687,9 @@ $(document).ready(async function() {
             formData.append('file', file);
         }
         try {
-            if (name && email && password && passwordConfirm)
+            if (name && email && password && passwordConfirm && role)
             {
+                let channel;
 
                 const fav = await axios({
                     method: 'POST',
@@ -360,6 +699,21 @@ $(document).ready(async function() {
                         type: 'Favourites'
                     }
                 });
+                
+                if (role === "artist") {
+                    try {
+                        const channelReq = await axios({
+                            method: 'POST',
+                            url: '/api/v1/channels'
+                        });
+
+                        if (channelReq.status === 201) {
+                            channel = channelReq.data._id;
+                        }
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
 
                 const res = await axios({
                     method: 'POST',
@@ -369,6 +723,7 @@ $(document).ready(async function() {
     
                 if (res.data.data.key) 
                 {
+                    console.log(channel);
                     const res1 = await axios({
                         method: 'POST',
                         url: '/api/v1/users/signup',
@@ -378,14 +733,16 @@ $(document).ready(async function() {
                             password,
                             passwordConfirm,
                             photoKey: res.data.data.key,
-                            favourites: fav.data._id
+                            favourites: fav.data._id,
+                            role,
+                            channel
                         }
                     });
     
                     if (res1.status == 201)
                     {
-                        alert("Вы были жестоко зарегистрированы!");
-                        $("#toregister").hide(200);
+                        alert("Вы были зарегистрированы!");
+                        window.location.reload();
                     }
                 }
             }
@@ -411,9 +768,11 @@ $(document).ready(async function() {
                 });
 
                 if (res.status === 200) {
-                    alert("energetic drink");
                     if (res.data.data.user.role === "moderator") {
                         window.location = "/moderator"
+                    }
+                    else if (res.data.data.user.role === 'user' || res.data.data.user.role === 'artist') {
+                        window.location.reload();
                     }
                 }
             } catch (err) {
@@ -432,7 +791,7 @@ $(document).ready(async function() {
         }
     });
 
-    $("#delapprovereq").click(async function() {
+    $(".delapprovereq").off('click').click(async function() {
         try {
             const res = await axios({
                 method: 'DELETE',
@@ -441,6 +800,7 @@ $(document).ready(async function() {
 
             if (res.status == 200) {
                 alert("Успех!");
+                window.location.reload();
             }
         } catch (err) {
             alert("Something went catastrofically wrong");
@@ -448,7 +808,7 @@ $(document).ready(async function() {
         }
     });
 
-    $("#delcancelreq").click(async function() {
+    $(".delcancelreq").off('click').click(async function() {
         try {
             const res = await axios({
                 method: 'DELETE',
@@ -457,6 +817,7 @@ $(document).ready(async function() {
 
             if (res.status == 200) {
                 alert("Успех!");
+                window.location.reload();
             }
         } catch (err) {
             alert("something went wrongelo");
@@ -475,28 +836,10 @@ $(document).ready(async function() {
             rs.empty();
             await rs.append(res.data.data.html);
 
-            artistPageHandlers(this.id);   
+            artistPageHandlers(this.id);
+            topMenuHandlers();
         } catch (err) {
             alert("SOmethign went extremely outragegous");
-            console.log(err);
-        }
-    });
-
-    $("#friendsPage").click(async function () {
-        try {
-            const res = await axios({
-                method: 'GET',
-                url: '/api/v1/html/friendsPage'
-            });
-
-            let mp = $(".middle_part");
-            mp.empty();
-            await mp.append(res.data.data.html);
-
-            friendsPageHanlders();
-
-        } catch (err) {
-            alert("somethign wrongelo");
             console.log(err);
         }
     });
@@ -536,12 +879,198 @@ $(document).ready(async function() {
             console.log(err);
         }
     });
+
+    $(".searchBtn").click(async function(el) {
+        el.preventDefault();
+        const userInput = $(".searchInput").val();
+        if (userInput) {
+            await $(".middle_part").children().hide();
+            await $("#searchResultsBox").remove();
+
+            await $(".middle_part").append(`
+                <div id="searchResultsBox">
+                    <p style="font-size: 2.8rem; margin-bottom: 3rem;" id="searchTitle">Поиск</p>
+                    <button class="link_button " style="margin-right: 2rem;" id="backSearch">Назад</button>
+                    <button class="link_button " style="margin-right: 2rem;" id="searchTracks">Треки</button>
+                    <button class="link_button " style="margin-right: 2rem; margin-bottom: 3rem;" id="searchAuthors">Исполнители</button>
+                    <div id="tracksHolder"></div>
+                </div>
+            `);
+
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: `/api/v1/mediafiles/search/${userInput}`
+                });
+
+                if (res.status === 200) {
+                    await $('#tracksHolder').empty();
+                    await printPlaylistTracks(res.data);
+                    audioFileHandlers();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+
+            $("#searchAuthors").click(async function() {
+                try {
+                    const res = await axios({
+                        method: 'GET',
+                        url: `/api/v1/users/authors/search/${userInput}`
+                    });
+
+                    if (res.status === 200) {
+                        await $('#tracksHolder').empty();
+                        const authors = res.data;
+                        for (let i = 0; i < authors.length; i++) {
+                            await $("#tracksHolder").append(`
+                                <div class="searchAuthorItemBox searchAuthorItem" data-artistid="${authors[i]._id}">
+                                    <div style="width: 10rem; height: 10rem; border-radius: 2rem; overflow: hidden;display: flex; align-items: center; justify-content: center;"><img src="/api/v1/file/${authors[i].photoKey}" width="100%"></div>
+                                    <p style="font-size: 2.4rem;">${authors[i].name}</p>
+                                </div>
+                                `);
+                        }
+
+                        $(".searchAuthorItem").click(async function() {
+                            try {
+                                const res = await axios({
+                                    method: 'GET',
+                                    url: '/api/v1/html/artistPage'
+                                });
+
+                                let rs = $(".right_section");
+                                rs.empty();
+                                await rs.append(res.data.data.html);
+
+                                artistPageHandlers(this.dataset.artistid);
+                                topMenuHandlers();
+                            } catch (err) {
+                                alert("SOmethign went extremely outragegous");
+                                console.log(err);
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+
+            $("#searchTracks").click(async function() {
+                try {
+                    const res = await axios({
+                        method: 'GET',
+                        url: `/api/v1/mediafiles/search/${userInput}`
+                    });
+
+                    if (res.status === 200) {
+                        await $('#tracksHolder').empty();
+                        await printPlaylistTracks(res.data);
+                        audioFileHandlers();
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+
+            $("#backSearch").click(async function() {
+                $("#searchResultsBox").remove();
+                $(".middle_part").children().show();
+            });
+        }
+    });
+};
+
+const topMenuHandlers = (req, res) => {
+    $("#friendsPage").off('click').click(async function () {
+        $(".underline").fadeOut(100, function() {$(this).remove()});
+        $(this).append('<div class="underline"></div>');
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/friendsPage'
+            });
+
+            let mp = $(".middle_part");
+            mp.empty();
+            await mp.append(res.data.data.html);
+
+            friendsPageHanlders();
+
+        } catch (err) {
+            alert("somethign wrongelo");
+            console.log(err);
+        }
+    });
+    $("#mainPageLink").off('click').click(async function() {
+        $(".underline").fadeOut(100, function() {$(this).remove()});
+        $(this).append('<div class="underline"></div>');
+
+        await loadMainPage();
+        topMenuHandlers();
+    });
+};
+
+$(document).ready(async function() {
+    audioHostingHandlers();
+    topMenuHandlers();
+    mainPageHandlers();
+    audioFileHandlers();
+
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/users/me'
+        });
+
+        currentUser = res.data;
+
+        if (currentUser.role === 'artist') {
+            await $(".audio_hosting_menu").append(`
+                <div class="hosting_menu_item hover_effect" id="artistPageLink">
+                    <div class="active_hosting_page hidden"></div>
+                    <img class="hosting_image" src="/data/icons/user.png" alt="">
+                    <p class="hosting_menu_text">Артист Ну Артист</p>
+                </div>    
+            `);
+            
+            $("#artistPageLink").click(async function() {
+                try {
+                    const res = await axios({
+                        method: 'GET',
+                        url: '/api/v1/html/authorPage'
+                    });
+                
+                    let rs = $(".right_section");
+                    rs.empty();
+                    await rs.append(res.data.data.html);
+        
+                    authorPageHandlers();
+                } catch (err) 
+                {
+                    if (err.response.status == 401)
+                    {
+                        alert("Необходимо авторизоваться!");
+        
+                        $("#tologin").show(200);
+                    }
+                }
+            });
+        }
+
+    } catch (err)
+    {
+        console.log(err);
+    }
+
+    
 });
 
 
 const audioFileHandlers = () => {
     let currentTrack;
-    $(".likeTrack").click(async function () {
+    updatePlayer();
+    $(".likeTrack").off('click').click(async function () {
+        if (!currentTrackId) return;
         if (currentUser)
         {
             try {
@@ -549,7 +1078,7 @@ const audioFileHandlers = () => {
                     method: 'PATCH',
                     url: `/api/v1/playlists/addTrack/${currentUser.favourites}`,
                     data: {
-                        audioFileId: this.parentNode.parentNode.parentNode.id
+                        audioFileId: currentTrackId
                     }
                 });
 
@@ -565,22 +1094,21 @@ const audioFileHandlers = () => {
         }
     });
 
-    $(".threeDotsPlaylist").click(function () {
-        currentTrack = this.parentNode.parentNode.parentNode.id;
+    $(".threeDotsPlaylist").off('click').click(function () {
         $("#playlistbox").show(200);
     });
 
-    $(".playlist_overlay").click(function() {
+    $(".playlist_overlay").off('click').click(function() {
         $("#playlistbox").hide(200);
     });
 
-    $(".playlist_item").click(async function () {
+    $(".playlist_item").off('click').click(async function () {
         try {
             const res = await axios({
                 method: 'PATCH',
                 url: `/api/v1/playlists/addTrack/${this.id}`,
                 data: {
-                    audioFileId: currentTrack
+                    audioFileId: currentTrackId
                 }
             });
 
@@ -594,8 +1122,9 @@ const audioFileHandlers = () => {
         }
     });
 
-    $(".shareTrack").click(async function() {
-        currentTrack = this.parentNode.parentNode.parentNode.id;
+    $(".shareTrack").off('click').click(async function() {
+        if (!currentTrackId) return;
+            
         $("#shareChats").show(200);
         try {
             const res = await axios({
@@ -635,14 +1164,11 @@ const audioFileHandlers = () => {
                     url: '/api/v1/messages',
                     data: {
                         type: 'Mediafile',
-                        mediafile: currentTrack,
+                        mediafile: currentTrackId,
                         author: currentUser._id,
                         chat: this.id
                     }
                 });
-
-                console.log(currentTrack);
-                console.log(res);
                 
                 if (res.status === 204) {
                     alert("Аудиофайл отправлен этому челику");
@@ -654,9 +1180,28 @@ const audioFileHandlers = () => {
         });
     });
 
-    $(".chatsOverlay").click(function(el) {
+    $(".chatsOverlay").off('click').click(function(el) {
         if ($(el.target)["0"] == this) {
             $("#shareChats").hide(200);
+        }
+    });
+
+    $(".track").off('click').click(async function(el) {
+        if ($(el.target.parentNode)["0"] == this) {
+            currentTrackId = this.id;
+            currentAuthor = this.dataset.authorname;
+            currentPlayingTrack = this.dataset.trackname;
+            currentCover = this.dataset.cover;
+            try {
+                const res = await axios({
+                    method: 'PATCH',
+                    url: `/api/v1/mediafiles/listen/${this.id}`
+                });
+            } catch (err) {
+                console.log(err);
+            }
+            await loadMusic(this.dataset.key, currentCover, currentAuthor, currentPlayingTrack);
+            playMusic();
         }
     });
 };
@@ -730,32 +1275,7 @@ const userPageHandlers = async function () {
         console.log(err);
     }
 
-    try {
-        const res = await axios({
-            method: 'GET',
-            url: '/api/v1/playlists/myPlaylists'
-        });
-
-        console.log(res.data);
-
-        if (res.status === 200) {
-            const playlists = res.data;
-            for (let i = 0; i < playlists.length; i++) {
-                $("#playlistsList").append(
-                    `
-                        <div class="widget_card">
-                            <div class="black_fade">
-                                <p class="widget_card_name">${playlists[i].name}</p>
-                            </div>
-                        </div>
-                    `
-                );
-            }
-        }
-    } catch (err) {
-        alert("Хотел вывести плейлисты но чет не пошло крч");
-        console.log(err);
-    }
+    loadPlaylists();
 
     $("#createPlaylist").click(async function() {
         const whateverTheAnswerIs = prompt("Введите имя для плейлиста: ");
@@ -772,7 +1292,7 @@ const userPageHandlers = async function () {
                 });
 
                 if (res.status === 200) {
-                    alert("Плейлист был официально создан!");
+                    loadPlaylists();
                 }
             } catch (err) {
                 alert("Something went wrongelo!!!");
@@ -781,6 +1301,68 @@ const userPageHandlers = async function () {
         }
     });
 };
+
+const loadPlaylists = async () => {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: '/api/v1/playlists/myPlaylists'
+        });
+
+        if (res.status === 200) {
+            const playlists = res.data;
+            await $("#playlistsList").empty();
+            for (let i = 0; i < playlists.length; i++) {
+                await $("#playlistsList").append(
+                    `
+                        <div class="widget_card playlistItem" id="${playlists[i]._id}">
+                            <div class="black_fade">
+                                <p class="widget_card_name">${playlists[i].name}</p>
+                            </div>
+                        </div>
+                    `
+                );
+            }
+
+            $('.playlistItem').click(async function() {
+                $(".authors_box").hide(200);
+                $(".recommendations_box").hide(200);
+                $(".widgets_box").hide(200);
+
+                await $(".middle_part").append(`
+                        <button class="link_button playlistBack">Назад</button>
+                        <div id="tracksHolder"></div>
+                    `);
+                
+                $(".playlistBack").click(function() {
+                    $('.authors_box').show(200);
+                    $('.recommendations_box').show(200);
+                    $('.widgets_box').show(200);
+
+                    $("#tracksHolder").remove();
+                    $(this).remove();
+                });
+                
+                try {
+                    const res = await axios({
+                        method: 'GET',
+                        url: `/api/v1/mediafiles/playlist/${this.id}`
+                    });
+
+                    if (res.status === 200) {
+                        await printPlaylistTracks(res.data);
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+        }
+    } catch (err) {
+        alert("Хотел вывести плейлисты но чет не пошло крч");
+        console.log(err);
+    }
+}
 
 const friendsPageHanlders = async function() {
 
@@ -890,6 +1472,7 @@ const updateFriendsHandlers = async function() {
                 await $('.visibleParts').empty().append(res.data);
 
                 messengerPageHandlers(this.parentNode.parentNode.parentNode.id);
+                audioFileHandlers();
             }
         } catch (err) {
             alert("something went wrong");
@@ -898,9 +1481,10 @@ const updateFriendsHandlers = async function() {
     });
 };
 
-const messengerPageHandlers = async function(userid) {
+const messengerPageHandlers = async function(userid, channelId) {
     let currentChat;
     let updateChat;
+    let currentPost;
 
     if (currentUser.role === 'artist') {
         await $("#chatsList").append(`
@@ -908,10 +1492,10 @@ const messengerPageHandlers = async function(userid) {
                 <img src="./data/icons/plus.png" alt="" width="27rem">
                 <p style="font-size: 1.6rem; font-weight: 600;">Создать пост</p>
             </button>
-            <div class="ms_message_field" id="loadChannel">
+            <div class="ms_message_field channelItem" id="${currentUser.channel}">
                 <div style="display: flex; align-items: center; gap: 2rem;">
                     <div class="ms_message_avatar">
-                        <img src="./data/users/bf84a85797cba4df53b7c3341ca377a5.jpg" alt="">
+                        <img src="/api/v1/file/${currentUser.photoKey}" alt="">
                     </div>
                     <div style="display: flex; flex-direction: column;">
                         <p class="ms_message_name">Ваш канал</p>
@@ -919,6 +1503,30 @@ const messengerPageHandlers = async function(userid) {
                 </div>
             </div>
             `)
+    }
+
+    if (channelId) {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: `/api/v1/posts/${channelId}`
+            });
+
+            if (res.status === 200) {
+                const posts = res.data;
+
+                await printPosts(posts);
+
+                $('.comment_btn').click(function() {
+                    $("#commentsBox").show(200);
+                    currentPost = this.id;
+                    updateCommentSection(currentPost);
+                });
+            }
+        } catch (err) {
+            alert("was unable to load posts");
+            console.log(err);
+        }
     }
 
     $("#createPost").click(async function() {
@@ -970,9 +1578,11 @@ const messengerPageHandlers = async function(userid) {
         $('#post_creation_input').on('input', function() {
             $('#postContent').text($(this).val());
         });
+
         $('#post_creation_header').on('input', function() {
             $('#postHeader').text($(this).val());
         });
+
         $("#loadPost").click(async function (e) {
             e.preventDefault();
             const formData = new FormData();
@@ -1011,18 +1621,69 @@ const messengerPageHandlers = async function(userid) {
         })
     });
 
+    if (userid)
+    {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: `/api/v1/chats/loadChat/${userid}`
+            });
+        
+            if (res.status === 200) {
+                currentChat = res.data.id;
+                printMessages(currentChat);
+
+                clearInterval(updateChat);
+                updateChat = setInterval(() => {
+                if (currentChat)
+                {
+                    printMessages(currentChat);
+                }
+            }, 1000);
+            }
+        } catch (err) {
+            alert("something went wrongelo");
+            console.log(err);
+        }
+    }
+
     try {
         const res = await axios({
             method: 'GET',
-            url: `/api/v1/chats/loadChat/${userid}`
+            url: '/api/v1/channels/myFollowedChannels'
         });
-    
+
         if (res.status === 200) {
-            currentChat = res.data;
-            printMessages(currentChat._id);
+            const channels = res.data;
+            $("#chatsList").append('<p class="chatsListTitle">Каналы</p>');
+                for (let i = 0; i < channels.length; i++) {
+                    $("#chatsList").append(`
+                        <div class="ms_message_field channelItem" id="${channels[i]._id}">
+                            <div style="display: flex; align-items: center; gap: 2rem;">
+                                <div class="ms_message_avatar">
+                                    <img src="./data/CRAZY.jpg" alt="">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <p class="ms_message_name">Когда нибудь будет</p>
+                                </div>
+                            </div>
+                        </div>
+                `)
+            }
+
+            $(".channelItem").click(async function() {
+                clearInterval(updateChat);
+                await loadChannel(this.id);
+
+                $('.comment_btn').click(function() {
+                    $("#commentsBox").show(200);
+                    currentPost = this.id;
+                    updateCommentSection(currentPost);
+                });
+            });
+
         }
     } catch (err) {
-        alert("something went wrongelo");
         console.log(err);
     }
 
@@ -1033,29 +1694,44 @@ const messengerPageHandlers = async function(userid) {
         });
 
         if (res.status == 200) {
-            for (let i = 0; i < res.data.length; i++) {
-                let otherUser;
-                if (res.data[i].user1._id === currentUser._id) otherUser = res.data[i].user2;
-                else otherUser = res.data[i].user1;
-                $("#chatsList").append(`
-                    <div class="ms_message_field">
-                        <div style="display: flex; align-items: center; gap: 2rem;">
-                            <div class="ms_message_avatar">
-                                <img src="/api/v1/file/${otherUser.photoKey}" alt="">
-                            </div>
-                            <div style="display: flex; flex-direction: column;">
-                                <p class="ms_message_name">${otherUser.name}</p>
+            $("#chatsList").append('<p class="chatsListTitle">Сообщения</p>');
+                for (let i = 0; i < res.data.length; i++) {
+                    let otherUser;
+                    if (res.data[i].user1._id === currentUser._id) otherUser = res.data[i].user2;
+                    else otherUser = res.data[i].user1;
+                    await $("#chatsList").append(`
+                        <div class="ms_message_field chatItem" id="${res.data[i]._id}">
+                            <div style="display: flex; align-items: center; gap: 2rem;">
+                                <div class="ms_message_avatar">
+                                    <img src="/api/v1/file/${otherUser.photoKey}" alt="">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <p class="ms_message_name">${otherUser.name}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 `);
             }
-            updateChat = setInterval(() => {
-                if (currentChat)
-                {
-                    printMessages(currentChat._id);
-                }
-            }, 1000);
+
+            $(".chatItem").click(function() {
+                currentChat = this.id;
+                printMessages(currentChat);
+
+                clearInterval(updateChat);
+                updateChat = setInterval(() => {
+                    if (currentChat)
+                    {
+                        printMessages(currentChat);
+                    }
+                }, 1000);
+            });
+            
+            // updateChat = setInterval(() => {
+            //     if (currentChat)
+            //     {
+            //         printMessages(currentChat._id);
+            //     }
+            // }, 1000);
         }
     } catch (err) {
         alert("Something went wrong");
@@ -1075,12 +1751,12 @@ const messengerPageHandlers = async function(userid) {
                     data: {
                         content: messageContent,
                         type: 'Text',
-                        chat: currentChat._id
+                        chat: currentChat
                     }
                 });
 
                 if (res.status === 204) {
-                    printMessages(currentChat._id);
+                    printMessages(currentChat);
                 }
             } catch (err) {
                 alert("something went wronghelo");
@@ -1089,91 +1765,190 @@ const messengerPageHandlers = async function(userid) {
         }
     });
 
-    $("#loadChannel").click(async function() {
-        clearInterval(updateChat);
-        try {
-            const res = await axios({
-                method: 'GET',
-                url: `/api/v1/posts/${currentUser.channel}`
-            });
+    // $("#loadChannel").click(async function() {
+    //     clearInterval(updateChat);
+    //     loadChannel(currentUser.channel);
+    // });
 
-            if (res.status === 200) {
-                const posts = res.data;
-
-                await $("#messagesHolder").empty();
-                for (let i = 0; i < posts.length; i++) {
-                    await $("#messagesHolder").append(`
-                            <div class="income_box">
-                                <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
-                                    <img src="./data/12dcd2799b4e5ead1b94fe052ab30568.jpg" alt="">
-                                </div>
-                                <div style="width: 100%; padding-top: 1rem;">
-                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">godtearz - <span>8:40</span></p>
-                                    <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
-                                        <div class="ms_post_pic">
-                                            <img src="/api/v1/file/${posts[i].photoKey}" alt="">
-                                        </div>
-
-                                        <p style="font-size: 1.8rem; padding: 1rem 2rem; font-weight: 900;">
-                                            ${posts[i].header}
-                                        </p>
-
-                                        <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5;">
-                                            ${posts[i].content}
-                                        </p>
-
-                                        <div class="comment_btn">
-                                            <p><span>231</span> комментариев ---></p>
-                                        </div>
-
-                                        <div class="comment_section comment_gone">
-                                            <p style="font-size: 1.8rem; margin-bottom: 1rem;">Комментарии</p>
-
-                                            <div class="comment_box">
-                                                <div style="width: 3.4rem; height: 3.4rem; cursor: pointer; border-radius: 50%; overflow: hidden; display: flex; align-items: center; flex-shrink: 0;">
-                                                    <img src="./data/users/bf84a85797cba4df53b7c3341ca377a5.jpg" alt="" width="100%">
-                                                </div>
-                                                <div>
-                                                    <p style="font-size: 1.4rem;">Узник сартира - 12:45</p>
-                                                    <div class="comment_place">
-                                                        <p>Смотрите я не быдло, я в театр прише fasd fafd asл</p>
-                                                    </div>
-                                                    <div class="comment_place">
-                                                        <p>Где Америка находится лмао</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="comment_box">
-                                                <div style="width: 3.4rem; height: 3.4rem; cursor: pointer; border-radius: 50%; overflow: hidden; display: flex; align-items: center; flex-shrink: 0;">
-                                                    <img src="./data/users/ce8d6fed5b090a15cc5ec89f8d3862c4.jpg" alt="" width="100%">
-                                                </div>
-                                                <div>
-                                                    <p style="font-size: 1.4rem;">Альберт Эндшпиль - 12:45</p>
-                                                    <div class="comment_place">
-                                                        <p>За языком следи уважаемый</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        `)
-                }
-
-                $('.comment_btn').click(function() {
-                    $(this).next('.comment_section').toggleClass('comment_gone');
-                });
-            }
-        } catch (err) {
-            alert("was unable to load posts");
-            console.log(err);
+    $(".comment_overlay").click(function(el) {
+        if ($(el.target)["0"] == this) {
+            $("#commentsBox").hide(200);
         }
     });
+
+    $("#sendComment").click(async function(el) {
+        el.preventDefault();
+        const content = $("#commentContent").val();
+        console.log(content, currentPost);
+
+        if (content && currentPost)
+        {
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/comments',
+                    data: {
+                        author: currentUser._id,
+                        content,
+                        post: currentPost
+                    }
+                });
+
+                if (res.status == 204) {
+                    updateCommentSection(currentPost);
+                    $("#commentContent").val("");
+                }
+            } catch (err) {
+                alert("Пытался отправить комментарий а вот чета не пошло както");
+                console.log(err);
+            }
+        }
+    });
+
+    $(".ms_main_icon").click(async function() {
+        clearInterval(updateChat);
+        const visibleParts = $(".visibleParts");
+        await visibleParts.empty();
+        await visibleParts.append('<section class="main_landing"></section>');
+
+        try {
+            const res = await axios({
+                method: "GET",
+                url: '/api/v1/html/leftSection'
+            });
+
+            let ml = $('.main_landing');
+            await ml.append(res.data);
+            await ml.append("<section class='right_section'></section>");
+
+            if (currentUser.role === 'artist') {
+                await $(".audio_hosting_menu").append(`
+                    <div class="hosting_menu_item hover_effect" id="artistPageLink">
+                        <div class="active_hosting_page hidden"></div>
+                        <img class="hosting_image" src="/data/icons/user.png" alt="">
+                        <p class="hosting_menu_text">Артист Ну Артист</p>
+                    </div>    
+                `);
+                
+                $("#artistPageLink").click(async function() {
+                    try {
+                        const res = await axios({
+                            method: 'GET',
+                            url: '/api/v1/html/authorPage'
+                        });
+                    
+                        let rs = $(".right_section");
+                        rs.empty();
+                        await rs.append(res.data.data.html);
+            
+                        authorPageHandlers();
+                    } catch (err) 
+                    {
+                        if (err.response.status == 401)
+                        {
+                            alert("Необходимо авторизоваться!");
+            
+                            $("#tologin").show(200);
+                        }
+                    }
+                });
+            }
+            
+            audioHostingHandlers();
+
+            loadMainPage();
+        } catch (err) {
+            console.log(err);
+        }
+
+    });
 };
+
+const updateCommentSection = async function(postId) {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/comments/${postId}`
+        });
+
+        if (res.status === 200) {
+            const comments = res.data;
+            const actualComments = $("#actualComments");
+            await actualComments.empty();
+
+            for (let i = 0; i < comments.length; i++) {
+                await actualComments.append(`
+                        <div class="income_box">
+                            <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                <img src="/api/v1/file/${comments[i].author.photoKey}" alt="">
+                            </div>
+                            <div style="width: 40%; padding-top: 1rem;">
+                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${comments[i].author.name} - <span>8:40</span></p>
+                                <div class="ms_message_box" style="border-top-left-radius: 0;">
+                                    <p class="ms_message_content">${comments[i].content}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+            }
+        }
+    } catch (err) {
+        alert("Чет не получилось коммента загрузить крч");
+        console.log(err);
+    }
+};
+
+const loadChannel = async function(channelId) {
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: `/api/v1/posts/${channelId}`
+        });
+
+        if (res.status === 200) {
+            const posts = res.data;
+
+            await printPosts(posts);
+        }
+    } catch (err) {
+        alert("was unable to load posts");
+        console.log(err);
+    }
+}
+
+const printPosts = async function(posts) {
+    await $("#messagesHolder").empty();
+    for (let i = 0; i < posts.length; i++) {
+        await $("#messagesHolder").append(`
+                <div class="income_box">
+                    <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                        <img src="./data/12dcd2799b4e5ead1b94fe052ab30568.jpg" alt="">
+                    </div>
+                    <div style="width: 100%; padding-top: 1rem;">
+                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">godtearz - <span>8:40</span></p>
+                        <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
+                            <div class="ms_post_pic">
+                                <img src="/api/v1/file/${posts[i].photoKey}" alt="">
+                            </div>
+
+                            <p style="font-size: 1.8rem; padding: 1rem 2rem; font-weight: 900;">
+                                ${posts[i].header}
+                            </p>
+
+                            <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5;">
+                                ${posts[i].content}
+                            </p>
+
+                            <div class="comment_btn" id="${posts[i]._id}">
+                                <p><span>231</span> комментариев ---></p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            `)
+    }
+}
 
 const printMessages = async function(chatid) {
     try {
@@ -1293,11 +2068,29 @@ const printMessages = async function(chatid) {
                     }
                 }
             }
+            
             const mh = document.querySelector("#messagesHolder");
             mh.scrollTo(0, mh.scrollHeight);
         }
     } catch (err) {
-        alert("No messages lol");
+        console.log("something went wrong");
+        clearInterval(updateChat);
         console.log(err);
     }
+};
+
+const updatePlayer = function() {
+    $(".playBtn").off('click').click(() => togglePlay());
+    $(".progress_bar").click(setProgressBar);
+    $('.music_player_sound_bar').click(setSoundBar);
+
+    if (currentCover && currentAuthor && currentPlayingTrack)
+    {
+        $(".songImage").attr('src', `/api/v1/file/${currentCover}`);
+        $(".music_player_name").text(currentPlayingTrack);
+        $(".music_player_author").text(currentAuthor);
+
+        checkPlaying();
+    }
+
 }

@@ -37,9 +37,6 @@ exports.getAuthorPage = () => {
                             </div>
 
                         </div>
-
-                        
-
                         
                         <div style="height: 100%; display: grid; grid-template-columns: 1fr; grid-template-rows: 5rem 52rem; min-width: 0; min-height: 0;">
                             <div>
@@ -47,26 +44,6 @@ exports.getAuthorPage = () => {
                             </div>
                             
                             <div style="overflow: scroll; min-width: 0;display: flex; flex-direction: column;" id="tracksHolder">
-                                
-                                <div class="track">
-                                    <div class="track_item">
-
-                                        <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                            <div style="width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center;">
-                                                <img src="./data/3baa4d90ebd753568b6b3452dc250796.jpg" alt="" width="100%">
-                                            </div>
-                                            <p style="font-size: 2rem;">исчезаю</p>
-                                        </div>
-
-                                        <div style="display: flex; align-items: center; gap: 2.4rem;">
-                                            <p style="font-size: 1.4rem; color: #ccc;">Psychosis, Апология</p>
-                                            <img src="./data/icons/share.png" alt="" width="20rem">
-                                            <img src="./data/icons/more.png" alt="" width="20rem" id="likeTrack">
-                                            <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
-                                        </div>
-
-                                    </div>
-                                </div>
 
                             </div>
 
@@ -79,36 +56,16 @@ exports.getAuthorPage = () => {
 
                     <section class="right_part">
 
-                        <div style="margin-bottom: 0;">
-                            <p style="font-size: 2.4rem; margin-bottom: 1.2rem;">Релизы</p>
-                            <div style="position: relative;">
-                                <div class="releases_list">
-
-                                    <div style="width: 24rem; display: flex; flex-direction: column; gap: 1.6rem;">
-                                        <div class="album_cover">
-                                            <img width="100%" src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="">
-                                        </div>
-                                        <div>
-                                            <p class="album_name">День когда я умер</p>
-                                            <p class="item_type">Альбом</p>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                                <div class="left_btn">
-                                    <img src="./data/icons/left-arrow.png" alt="">
-                                </div>
-        
-                                <div class="right_btn">
-                                    <img src="./data/icons/right-arrow.png" alt="">
-                                </div>                                
-                            </div>
-                        </div>
-
                         <div>
                             <p style="font-size: 2.4rem; margin-bottom: 1.2rem;">Альбомы</p>
                             <div style="position: relative;">
                                 <div class="releases_list" id="albums_list">
+
+                                    <div style="width: 24rem; display: flex; flex-direction: column; gap: 1.6rem;" id="createAlbum">
+                                        <div class="album_cover" style="display: flex; align-items: center; justify-content: center; border: solid 0.1rem white;">
+                                            <img width="100%" src="./data/icons/plus.png" alt="" style="width: 50%!important;">
+                                        </div>
+                                    </div>
 
                                     <div style="width: 24rem; display: flex; flex-direction: column; gap: 1.6rem;">
                                         <div class="album_cover">
@@ -150,8 +107,10 @@ exports.getAuthorPage = () => {
                                             <p class="music_player_author">Psychosis</p>
                                         </div>
                                         <div>
-                                            <img src="./data/icons/share.png" alt="" class="share_button">
-                                            <img src="./data/icons/more.png" alt="">
+                                            <img src="./data/icons/share.png" alt="" class="share_button shareTrack">
+                                            <img src="./data/icons/more.png" alt="" class="likeTrack">
+                                            <img src="./data/icons/threedots.png" alt="" class="threeDotsPlaylist" style="margin-left: 1.4rem;">
+                                            
                                         </div>
                                     </div>
                                     <div class="progress_bar">
@@ -276,12 +235,12 @@ exports.getArtistPage = () => {
             <header class="top_menu_bar">
 
                 <div class="top_menu_item">
-                    <p class="top_menu_title">Главная</p>
+                    <p class="top_menu_title" id="mainPageLink">Главная</p>
                     <div class="underline"></div>
                 </div>
 
                 <div class="top_menu_item">
-                    <p class="top_menu_title">Друзья</p>
+                    <p class="top_menu_title" id="friendsPage">Друзья</p>
                     <div class="underline dp_none"></div>
                 </div>
 
@@ -302,7 +261,7 @@ exports.getArtistPage = () => {
                             <div>
                                 <p style="font-size: 3.6rem; margin-bottom: 1.4rem;" id="authorprofilename">Psychosis</p>
                                 <div style="display: flex; align-items: center; gap: 3rem;">
-                                    <button class="link_button">Сообщество</button>
+                                    <button class="link_button channelLink">Сообщество</button>
                                 </div>
                             </div>
 
@@ -345,32 +304,6 @@ exports.getArtistPage = () => {
                     </section>
 
                     <section class="right_part">
-
-                        <div style="margin-bottom: 0;">
-                            <p style="font-size: 2.4rem; margin-bottom: 1.2rem;">Релизы</p>
-                            <div style="position: relative;">
-                                <div class="releases_list">
-
-                                    <div style="width: 24rem; display: flex; flex-direction: column; gap: 1.6rem;">
-                                        <div class="album_cover">
-                                            <img width="100%" src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="">
-                                        </div>
-                                        <div>
-                                            <p class="album_name">День когда я умер</p>
-                                            <p class="item_type">Альбом</p>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                                <div class="left_btn">
-                                    <img src="./data/icons/left-arrow.png" alt="">
-                                </div>
-        
-                                <div class="right_btn">
-                                    <img src="./data/icons/right-arrow.png" alt="">
-                                </div>                                
-                            </div>
-                        </div>
 
                         <div>
                             <p style="font-size: 2.4rem; margin-bottom: 1.2rem;">Альбомы</p>
@@ -417,8 +350,9 @@ exports.getArtistPage = () => {
                                             <p class="music_player_author">Psychosis</p>
                                         </div>
                                         <div>
-                                            <img src="./data/icons/share.png" alt="" class="share_button">
-                                            <img src="./data/icons/more.png" alt="">
+                                            <img src="./data/icons/share.png" alt="" class="share_button shareTrack">
+                                            <img src="./data/icons/more.png" alt="" class="likeTrack">
+                                            <img src="./data/icons/threedots.png" alt="" class="threeDotsPlaylist" style="margin-left: 1.4rem;">
                                         </div>
                                     </div>
                                     <div class="progress_bar">
@@ -513,22 +447,22 @@ exports.getMessengerPage = () => {
         <section style="display: flex; align-items: center; padding-left: 4rem; background-color: #242424;">
             <div class="ms_player">
                 <img src="./data/icons/moveLeft.png" alt="" style="width: 1.5rem;">
-                <img src="./data/icons/right.png" alt="" style="width: 2rem;">
+                <img src="./data/icons/right.png" alt="" style="width: 2rem;" class="playBtn">
                 <img src="./data/icons/moveRight.png" alt="" style="width: 1.5rem;">
                 <div class="ms_player_cover">
-                    <img src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="">
+                    <img src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="" class="songImage">
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <p style="font-size: 1.2rem;">аффект</p>
-                    <p style="color: #b9b9b9; margin-bottom: 0.8rem; font-size: 1.2rem;">Psychosis, godtearz, Апология</p>
-                    <div class="ms_progress_bar">
-                        <div class="ms_progress"></div>
+                    <p style="font-size: 1.2rem;" class="music_player_name">аффект</p>
+                    <p style="color: #b9b9b9; margin-bottom: 0.8rem; font-size: 1.2rem;" class="music_player_author">Psychosis, godtearz, Апология</p>
+                    <div class="progress_bar ms_progress_bar">
+                        <div class="progress ms_progress"></div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <img src="./data/icons/volume.png" alt="" style="width: 2rem;">
-                    <div class="ms_volume_bar">
-                        <div class="ms_volume"></div>
+                    <div class="music_player_sound_bar ms_volume_bar">
+                        <div class="music_player_volume ms_volume"></div>
                     </div>
                 </div>
             </div>
@@ -571,5 +505,275 @@ exports.getMessengerPage = () => {
             <p class="title_style" style="color: #eee; margin-bottom: 1.5rem;">Медиафайлы</p>
 
         </section>
+        </main>
+        <div class="to_hide dp_none" id="commentsBox">
+            <div class="comment_overlay">
+                <div class="comment_box">
+                    <p style="font-size: 1.8rem; margin-bottom: 2rem;">Комментарии</p>
+                    <div class="comment_section">
+                        <div style="overflow: scroll;" id="actualComments">
+                            <div class="income_box">
+                                <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
+                                    <img src="./data/12dcd2799b4e5ead1b94fe052ab30568.jpg" alt="">
+                                </div>
+                                <div style="width: 40%; padding-top: 1rem;">
+                                    <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">Уважаемый - <span>8:40</span></p>
+                                    <div class="ms_message_box" style="border-top-left-radius: 0;">
+                                        <p class="ms_message_content"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ms_message_input_box comment_input_box">
+                            <form action="" style="width: 100%; display: flex; gap: 2rem; align-items: center;">
+                                <input type="text" placeholder="Напишите сообщение..." class="ms_message_input comment_message_input" id="commentContent">
+                                <button class="send_message" id="sendComment">Отправить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
+};
+
+exports.getMainPage = () => {
+    return `
+      <header class="top_menu_bar">
+        <div class="top_menu_item" id="mainPageLink">
+          <p class="top_menu_title">Главная</p>
+          <div class="underline"></div>
+        </div>
+        
+        <div class="top_menu_item" id="friendsPage">
+          <p class="top_menu_title">Друзья</p>
+          <div class="underline dp_none"></div>
+        </div>
+      </header>
+      
+      <section class="main_section">
+        <section class="middle_part">
+          <div class="authors_box">
+            <div class="authors_link_box">
+              <p class="authors_title title_style">Топ исполнители</p>
+              <img class="authors_link" src="./data/icons/pink_next.png" alt="">
+            </div>
+            <p class="genres_title subtitle_style">Ислледуйте новые жанры</p>
+            
+            <div class="authors_list_box" id="topArtistsList">
+              
+            </div>
+          </div>
+          
+          <div class="widgets_box">
+            <p class="widget_title title_style">Вам понравится</p>
+            <div class="widget_cards_box">
+              <div class="widget_card">
+                <div class="black_fade">
+                  <p class="widget_card_name">Недавние</p>
+                  <p class="widget_card_info">saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi</p>
+                </div>
+              </div>
+              <div class="widget_card">
+                <div class="black_fade">
+                  <p class="widget_card_name">Недавние</p>
+                  <p class="widget_card_info">saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="recommendations_box">
+            <p class="recommendation_title title_style">Рекоммендации</p>
+            <p class="recommendation_info subtitle_style">Добавляйте треки в свои фавориты</p>
+            <div class="recommend_audio_box">
+              <div class="music_box" data-index="1">
+                <div class="music_box_inner">
+                  <div class="music_image_holder">
+                    <img src="./data/CRAZY.jpg" alt="">
+                  </div>
+                  <div class="music_info">
+                    <p class="music_name">CRAZY</p>
+                    <p class="music_author">LE SSERAFIM</p>
+                  </div>
+                </div>
+                <div class="music_box_inner">
+                  <p class="music_duration">2:44</p>
+                  <img class="add_music_icon" src="./data/icons/more.png" alt="">
+                </div>
+              </div>
+              
+              <div class="music_box" data-index="2">
+                <div class="music_box_inner">
+                  <div class="music_image_holder">
+                    <img src="./data/ЗАСТРЕЛИЛИ.jpg" alt="">
+                  </div>
+                  <div class="music_info">
+                    <p class="music_name">Застрелили!</p>
+                    <p class="music_author">h1deki</p>
+                  </div>
+                </div>
+                <div class="music_box_inner">
+                  <p class="music_duration">2:58</p>
+                  <img class="add_music_icon" src="./data/icons/more.png" alt="">
+                </div>
+              </div>
+              
+              
+            </div>
+          </div>
+        </section>
+        
+        <section class="right_part">
+          <div class="search_box">
+            <p class="search_title title_style">Поиск</p>
+            <p class="search_info subtitle_style">Более 1000+ композиций</p>
+            <form class="search_bar_holder" action="">
+              <input class="search_bar searchInput" type="text" placeholder="Любимые исполнители...">
+              <button class="search_button searchBtn">Найти</button>
+            </form>
+          </div>
+          
+          <div class="messenger_box">
+            <p class="messenger_box_title title_style">4 000+ пользователей уже на платформе</p>
+            <div class="messenger_card">
+              <div>
+                <p class="messenger_card_title">Мессенджер</p>
+                <p class="messenger_card_info">Делитесь вашими эмоциями и треками с друзьями. Прослушайте рекоммендации ваших друзей и их любимые треки</p>
+              </div>
+              <div>
+                <button class="messenger_button">Начать общение</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="music_player_box">
+            <div class="music_player_link">
+              <p class="music_player_title title_style">Сейчас играет: Фавориты</p>
+              <img src="./data/icons/pink_next.png" alt="">
+            </div>
+            <p class="music_player_type subtitle_style">Single</p>
+            <div class="music_player">
+              <div class="white_shine">
+                <div class="music_photo">
+                  <img class="songImage" src="./data/798f95310210edaf016bd94126d2ec96.jpg" alt="">
+                </div>
+              </div>
+              <div class="music_player_components_box">
+                <div class="music_player_title_box">
+                  <div>
+                    <p class="music_player_name">грааль</p>
+                    <p class="music_player_author">Psychosis</p>
+                  </div>
+                  <div>
+                    <img class="share_button shareTrack" src="./data/icons/share.png" alt="">
+                    <img src="./data/icons/more.png" alt="" class="likeTrack">
+                    <img src="./data/icons/threedots.png" alt="" class="threeDotsPlaylist" style="margin-left: 1.4rem;">
+                  </div>
+                </div>
+                <div class="progress_bar">
+                  <div class="progress"></div>
+                </div>
+                <div class="music_player_duration_box">
+                  <p class="currentTime">0:44</p>
+                  <p class="duration">2:17</p>
+                </div>
+                <div class="music_player_interact_box">
+                  <div class="music_player_control_buttons">
+                    <img class="prevBtn" src="./data/icons/moveLeft.png" alt="">
+                    <img class="playBtn" src="./data/icons/right.png" alt="">
+                    <img class="nextBtn" src="./data/icons/moveRight.png" alt="">
+                  </div>
+                  <div class="music_player_sound_control">
+                    <img src="./data/icons/volume.png" alt="" style="width: 2rem;">
+                    <div class="music_player_sound_bar">
+                      <div class="music_player_volume"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    `
+}
+
+exports.getLeftSection = () => {
+    return `
+        <section class="left_section">
+  <div class="top_section top_left_section">
+    <h1 class="company_name">ZZZvuk</h1>
+  </div>
+
+  <div class="left_section_menus">
+    <div class="audio_hosting_menu">
+      <div class="hosting_menu_item hover_effect" id="mainPage">
+        <div class="active_hosting_page"></div>
+        <img class="hosting_image" src="/data/icons/home.png" alt="">
+        <p class="hosting_menu_text">Главная</p>
+      </div>
+      <div class="hosting_menu_item hover_effect" id="profile">
+        <div class="active_hosting_page hidden"></div>
+        <img class="hosting_image" src="/data/icons/user.png" alt="">
+        <p class="hosting_menu_text">Профиль</p>
+      </div>
+    </div>
+
+    <div class="messenger_menu">
+      <div class="hosting_menu_item" style="padding-top: 0;">
+        <div class="active_hosting_page hidden"></div>
+        <img class="messenger_image" src="/data/icons/message.png" alt="">
+        <p class="hosting_menu_text">Мессенджер</p>
+      </div>
+
+      <div class="hosting_menu_item message_box hover_effect">
+        <div class="message_info">
+          <div class="active_hosting_page hidden"></div>
+          <div class="menu_profile_image_container">
+            <img class="profile_image" src="/data/authors/2cd312b369f6377166237a03b7215b56.jpg" alt="">
+          </div>
+          <p class="hosting_menu_text">Неадекват</p>
+        </div>
+        <div class="income_messages_circle">
+          <p class="income_message_amount">2</p>
+        </div>
+      </div>
+
+      <div class="hosting_menu_item message_box hover_effect">
+        <div class="message_info">
+          <div class="active_hosting_page hidden"></div>
+          <div class="menu_profile_image_container">
+            <img class="profile_image" src="/data/authors/6e268e284174e29e6daf7d516cf7b485.jpg" alt="">
+          </div>
+          <p class="hosting_menu_text">Димас</p>
+        </div>
+        <div class="income_messages_circle">
+          <p class="income_message_amount">4</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="management_menu">
+      <div class="management_title_box">
+        <div class="title_box">
+          <img src="/data/icons/profile.png" alt="" style="width: 2.5rem;">
+          <p class="management_menu_title">Управление</p>
+        </div>
+        <img class="togo_management_icon" src="/data/icons/yellow_next.png" alt="">
+      </div>
+
+      <div class="stats_container">
+        <div class="stats_holder" id="openStatistic">
+          <img src="/data/icons/loading.png" alt="">
+          <div class="stats_box">
+            <p class="stat_title">Статистика</p>
+            <p class="stat_info">Ваши треки и альбомы</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+    `
 }

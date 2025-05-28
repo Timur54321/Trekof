@@ -41,3 +41,34 @@ exports.findUsers = async (req, res) => {
     });
 };
 
+exports.getAuthors = async (req, res) => {
+    const authors = await User.find({role: 'artist'});
+
+    res.status(200).json(authors)
+};
+
+exports.addChannel = async (req, res) => {
+    const userId = req.params.key;
+    console.log(req.body.channel);
+
+    const user = await User.findByIdAndUpdate(
+        userId, // ID плейлиста
+        { $push: { followedChannels: req.body.channel } }, // audiofileId - ObjectId аудиофайла
+        { new: true } // Вернуть обновленный документ
+    );
+
+    res.status(200).json(user);
+};
+
+exports.getAuthorsBySearch = async (req, res) => {
+    try {
+        const key = req.params.key;
+        const tracks = await User.find({ 
+            name: { $regex: key, $options: 'i' },
+            role: 'artist'
+        });
+        res.status(200).json(tracks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

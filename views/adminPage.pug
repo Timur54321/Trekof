@@ -1,0 +1,54 @@
+extends base
+
+block links 
+    link(rel="stylesheet" href="./style/admin.css")
+
+block content 
+    main
+        section.moderator_section
+            .mod_left_bar
+                .mod_window
+                    div(style="width: 7rem;")
+                        img(src="./data/icons/report.png" alt="" width="100%")
+                    p Жалобы
+                .mod_window
+                    div(style="width: 7rem;")
+                        img(src="./data/icons/music-file.png" alt="" width="100%")
+                    p Заявки
+            .mod_right_bar
+                p.mod_title(style="margin-bottom: 2rem;") Cтатистика системы
+                .userStatItemBox
+                    .putInCenter(style="width: 20rem; height: 20rem; border-radius: 3rem; overflow: hidden;")
+                        img(src="./data/a028a2d8af21a00cd9c00bf0013ce5da.jpg" alt="" width="100%")
+                    div
+                        p(style="font-size: 1.8rem; color: rgb(60, 60, 60);") На платформе зарегистрировано 
+                            span(style="font-size: 2.4rem; font-weight: 900; color: black;") артистов
+                            | :
+                        p(style="font-size: 6.4rem; color: black;")= artistCount
+                .userStatItemBox
+                    .putInCenter(style="width: 20rem; height: 20rem; border-radius: 3rem; overflow: hidden;")
+                        img(src="./data/slushatel.jpg" alt="" width="100%")
+                    div
+                        p(style="font-size: 1.8rem; color: rgb(69, 69, 69);") На платформе зарегистрировано 
+                            span(style="font-size: 2.4rem; font-weight: 900; color: black;") пользователей
+                            | :
+                        p(style="font-size: 6.4rem; color: black;")= userCount
+                .userStatItemBox
+                    .putInCenter(style="width: 20rem; height: 20rem; border-radius: 3rem; overflow: hidden;")
+                        img(src="./data/moder.jpg" alt="" width="100%")
+                    div
+                        p(style="font-size: 1.8rem; color: rgb(60, 60, 60);") На платформе зарегистрировано 
+                            span(style="font-size: 2.4rem; font-weight: 900; color: black;") модератороф
+                            | :
+                        p(style="font-size: 6.4rem; color: black;")= moderCount
+                .userStatItemBox
+                    .putInCenter(style="width: 20rem; height: 20rem; border-radius: 3rem; overflow: hidden;")
+                        img(src="./data/recorder.jpg" alt="" width="100%")
+                    div
+                        p(style="font-size: 1.8rem; color: rgb(60, 60, 60);") На платформе зарегистрировано 
+                            span(style="font-size: 2.4rem; font-weight: 900; color: black;") трекоф
+                            | :
+                        p(style="font-size: 6.4rem; color: black;")= trackCount
+
+block scripts 
+    script(src='/js/moderator.js')
