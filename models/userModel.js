@@ -55,7 +55,12 @@ const userSchema = new mongoose.Schema(
                 type: mongoose.Schema.ObjectId,
                 ref: "Chat"
             }
-        ]
+        ],
+        status: {
+            type: String,
+            enum: ['active', 'blocked'],
+            default: 'active'
+        }
     }
 );
 

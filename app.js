@@ -16,6 +16,7 @@ const postRouter = require('./routes/postRouter');
 const channelRouter = require('./routes/channelRouter');
 const commentRouter = require('./routes/commentRouter');
 const albumRouter = require('./routes/albumRouter');
+const blockRequestRouter = require('./routes/blockRequestRouter');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -44,5 +45,6 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/channels', channelRouter);
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/albums', albumRouter);
+app.use('/api/v1/blockRequests', blockRequestRouter);
 
 module.exports = app;

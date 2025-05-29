@@ -21,7 +21,7 @@ exports.addTrack = async (req, res) => {
 
     const playlist = await Playlist.findByIdAndUpdate(
         playlistId, // ID плейлиста
-        { $push: { mediafiles: req.body.audioFileId } }, // audiofileId - ObjectId аудиофайла
+        { $addToSet: { mediafiles: req.body.audioFileId } }, // audiofileId - ObjectId аудиофайла
         { new: true } // Вернуть обновленный документ
     );
 
@@ -51,5 +51,33 @@ exports.getMyPlaylists = async (req, res) => {
     const playlists = await Playlist.find({owner: res.locals.user});
 
     res.status(200).json(playlists);
+};
+
+exports.deleteOne = async (req, res) => {
+    const playlist = await Playlist.findByIdAndDelete(req.params.key);
+
+    res.status(203).json(playlist);
+};
+
+exports.deleteTrack = async (req, res) => {
+    const playlistId = req.params.key;
+    const trackId = req.body.trackId;
+    
+    try {
+        const updatedPlaylist = await Playlist.findByIdAndUpdate(
+            playlistId,
+            { $pull: { mediafiles: trackId } }, // Удаляем trackId из массива mediafiles
+            { new: true } // Возвращаем обновленный документ
+        );
+
+        if (!updatedPlaylist) {
+            throw new Error('Плейлист не найден');
+        }
+
+        res.status(200).json('success');
+    } catch (error) {
+        console.error('Ошибка при удалении трека:', error);
+        res.status(500).json('failed');
+    }
 }
 

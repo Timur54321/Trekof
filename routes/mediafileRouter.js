@@ -7,6 +7,7 @@ router.post('/', mediafileController.createOne);
 
 router.patch('/:key', mediafileController.updateOne);
 router.get('/playlist/:key', mediafileController.getPlaylistTracks);
+router.get('/getRandomTracks', mediafileController.getRandomTracks);
 router.get('/:key', mediafileController.getArtistTracks);
 router.get('/search/:key', mediafileController.getTracksBySearch);
 router.get('/album/:key', mediafileController.getAlbumTracks);

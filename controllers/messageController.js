@@ -1,3 +1,4 @@
+const Chat = require("../models/chatModel");
 const MediaFile = require("../models/mediaFileModel");
 const Message = require("../models/messageModel");
 
@@ -9,6 +10,8 @@ exports.createOne = async (req, res) => {
         chat: req.body.chat,
         mediafile: req.body.mediafile
     });
+
+    const updatedChat = await Chat.findByIdAndUpdate(req.body.chat, {status: 'updated'});
 
     if (message.type === "Mediafile") {
         await MediaFile.findByIdAndUpdate(

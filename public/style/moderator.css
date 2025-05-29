@@ -55,6 +55,7 @@
     background-color: white;
     padding: 1.5rem 2.5rem;
     border-radius: 1.8rem;
+    margin-bottom: 3rem;
 }
 
 .request_basic_info {
@@ -76,7 +77,7 @@
 }
 
 .request_author p {
-    font-size: 2rem;
+    font-size: 1.6rem;
 }
 
 .request_player {
@@ -140,6 +141,15 @@
     height: 20rem;
     font-size: 2.4rem;
     padding: 1rem 3rem;
+}
+
+.reportItem {
+    padding: 3rem;
+    padding-right: 8rem;
+    border: solid 0.1rem #333;
+    margin-bottom: 4rem;
+    border-radius: 3rem;
+    width: 100rem;
 }
 
 

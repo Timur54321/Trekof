@@ -1,6 +1,12 @@
 const User = require('../models/userModel');
 
 exports.getMe = (req, res) => {
+    if (req.user.status === "blocked") {
+        return res.status(403).json({
+            status: 'blocked',
+            error: "Ваш аккаунт заблокирован"
+        });
+    }
     if (req.user) {
         req.user.password = undefined;
         return res.json(req.user);
@@ -71,4 +77,16 @@ exports.getAuthorsBySearch = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+exports.getModerators = async (req, res) => {
+    const users = await User.find({role: 'moderator'});
+
+    res.status(200).json(users);
+};
+
+exports.deleteOne = async (req, res) => {
+    const user = await User.findByIdAndDelete(req.params.key);
+
+    res.status(203).json(user);
 }

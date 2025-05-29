@@ -10,7 +10,7 @@ block content
                 .left_section_menus
                     .audio_hosting_menu
                         .hosting_menu_item.hover_effect#mainPage
-                            .active_hosting_page
+                            .active_hosting_page.hidden
                             img.hosting_image(src="/data/icons/home.png", alt="")
                             p.hosting_menu_text Главная
                         .hosting_menu_item.hover_effect#profile
@@ -18,43 +18,8 @@ block content
                             img.hosting_image(src="/data/icons/user.png", alt="")
                             p.hosting_menu_text Профиль
 
-                    .messenger_menu
-                        .hosting_menu_item(style="padding-top: 0;")
-                            .active_hosting_page.hidden
-                            img.messenger_image(src="/data/icons/message.png", alt="")
-                            p.hosting_menu_text Мессенджер
-
-                        .hosting_menu_item.message_box.hover_effect
-                            .message_info
-                                .active_hosting_page.hidden
-                                .menu_profile_image_container
-                                    img.profile_image(src="/data/authors/2cd312b369f6377166237a03b7215b56.jpg", alt="")
-                                p.hosting_menu_text Неадекват
-                            .income_messages_circle
-                                p.income_message_amount 2
-
-                        .hosting_menu_item.message_box.hover_effect
-                            .message_info
-                                .active_hosting_page.hidden
-                                .menu_profile_image_container
-                                    img.profile_image(src="/data/authors/6e268e284174e29e6daf7d516cf7b485.jpg", alt="")
-                                p.hosting_menu_text Димас
-                            .income_messages_circle
-                                p.income_message_amount 4
-
                     .management_menu
-                        .management_title_box
-                            .title_box
-                                img(src="/data/icons/profile.png", alt="", style="width: 2.5rem;")
-                                p.management_menu_title Управление
-                            img.togo_management_icon(src="/data/icons/yellow_next.png", alt="")
 
-                        .stats_container
-                            .stats_holder#openStatistic
-                                img(src="/data/icons/loading.png", alt="")
-                                .stats_box
-                                    p.stat_title Статистика
-                                    p.stat_info Ваши треки и альбомы
             section.right_section 
                 header.top_menu_bar
                     .top_menu_item#mainPageLink
@@ -85,52 +50,6 @@ block content
                                         .author_image_holder
                                             img(src=`/api/v1/file/${author.photoKey}`, alt="")
 
-                        .widgets_box
-                            p.widget_title.title_style Вам понравится
-                            .widget_cards_box
-                                .widget_card
-                                    .black_fade
-                                        p.widget_card_name Недавние
-                                        p.widget_card_info saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi
-                                .widget_card
-                                    .black_fade
-                                        p.widget_card_name Недавние
-                                        p.widget_card_info saybyetome!, aokigahara, nowayback, Nutakoe, auratoshi
-
-                        .recommendations_box
-                            p.recommendation_title.title_style Рекоммендации
-                            p.recommendation_info.subtitle_style Добавляйте треки в свои фавориты
-                            .recommend_audio_box
-                                .music_box(data-index="1")
-                                    .music_box_inner
-                                        .music_image_holder
-                                            img(src="./data/CRAZY.jpg", alt="")
-                                        .music_info
-                                            p.music_name CRAZY
-                                            p.music_author LE SSERAFIM
-                                    .music_box_inner
-                                        p.music_duration 2:44
-                                        img.add_music_icon(src="./data/icons/more.png", alt="")
-
-                                .music_box(data-index="2")
-                                    .music_box_inner
-                                        .music_image_holder
-                                            img(src="./data/ЗАСТРЕЛИЛИ.jpg", alt="")
-                                        .music_info
-                                            p.music_name Застрелили!
-                                            p.music_author h1deki
-                                    .music_box_inner
-                                        p.music_duration 2:58
-                                        img.add_music_icon(src="./data/icons/more.png", alt="")
-
-                    section.right_part
-                        .search_box
-                            p.search_title.title_style Поиск
-                            p.search_info.subtitle_style Более 1000+ композиций
-                            form.search_bar_holder(action="")
-                                input.search_bar.searchInput(type="text", placeholder="Любимые исполнители...")
-                                button.search_button.searchBtn Найти
-
                         .messenger_box
                             p.messenger_box_title.title_style 4 000+ пользователей уже на платформе
                             .messenger_card
@@ -140,10 +59,21 @@ block content
                                 div
                                     button.messenger_button Начать общение
 
+                        .recommendations_box
+                            p.recommendation_title.title_style Рекоммендации
+                            p.recommendation_info.subtitle_style Добавляйте треки в свои фавориты
+                            .recommend_audio_box
+
+
+                    section.right_part
+                        .search_box
+                            p.search_title.title_style Поиск
+                            p.search_info.subtitle_style Более 1000+ композиций
+                            form.search_bar_holder(action="")
+                                input.search_bar.searchInput(type="text", placeholder="Любимые исполнители...")
+                                button.search_button.searchBtn Найти
+
                         .music_player_box
-                            .music_player_link
-                                p.music_player_title.title_style Сейчас играет: Фавориты
-                                img(src="./data/icons/pink_next.png", alt="")
                             p.music_player_type.subtitle_style Single
                             .music_player
                                 .white_shine
@@ -157,6 +87,7 @@ block content
                                         div
                                             img.share_button.shareTrack(src="./data/icons/share.png", alt="")
                                             img.likeTrack(src="./data/icons/more.png", alt="")
+                                            img(src="./data/icons/threedots.png" alt="" class="threeDotsPlaylist" style="margin-left: 1.4rem;")
                                     .progress_bar
                                         .progress
                                     .music_player_duration_box
@@ -164,9 +95,7 @@ block content
                                         p.duration 2:17
                                     .music_player_interact_box
                                         .music_player_control_buttons
-                                            img.prevBtn(src="./data/icons/moveLeft.png", alt="")
                                             img.playBtn(src="./data/icons/right.png", alt="")
-                                            img.nextBtn(src="./data/icons/moveRight.png", alt="")
                                         .music_player_sound_control
                                             img(src="./data/icons/volume.png", alt="", style="width: 2rem;")
                                             .music_player_sound_bar

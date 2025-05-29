@@ -29,11 +29,16 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = async (req, res) => {
-    console.log(req.body);
     const newUser = await User.create(req.body);
 
     createSendToken(newUser, 201, res);
 };
+
+exports.signupModerator = async (req, res) => {
+    const newUser = await User.create(req.body);
+
+    res.status(201).json(newUser);
+}
 
 exports.login = async (req, res, next) => {
     const {email, password} = req.body;
@@ -51,6 +56,13 @@ exports.login = async (req, res, next) => {
         return res.status(401).json({
             status: 'failed',
             message: 'Login or passowrd is incorrect'
+        });
+    }
+
+    if (user.status === "blocked") {
+        return res.status(403).json({
+            status: 'failed',
+            message: 'Ваш аккаунт заблокирован 😥'
         });
     }
 

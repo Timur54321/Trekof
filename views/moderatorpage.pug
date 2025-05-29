@@ -4,14 +4,14 @@ block content
     main
         section.moderator_section
             .mod_left_bar
-                .mod_window
-                    div(style="width: 7rem;")
-                        img(src="/data/icons/report.png" alt="" width="100%")
-                    p Жалобы
-                .mod_window
+                .mod_window#loadRequests
                     div(style="width: 7rem;")
                         img(src="/data/icons/music-file.png" alt="" width="100%")
                     p Заявки
+                .mod_window#loadReports
+                    div(style="width: 7rem;")
+                        img(src="/data/icons/report.png" alt="" width="100%")
+                    p Жалобы
             
             .mod_right_bar
                 p.mod_title Заявки
@@ -23,12 +23,10 @@ block content
                                     p= new Date(req.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
                                 .request_author
                                     div.default(style="width: 6rem; height: 6rem; overflow: hidden; border-radius: 50%;")
-                                        img(src=`/api/v1/file/${req.artist.photoKey}` alt="" width="100%")
-                                    p= req.artist.name
+                                        img(src=`/api/v1/file/${req.mediaFile.coverKey}` alt="" width="100%")
+                                    p= req.mediaFile.name
                                 .request_player
-                                    div#playsong(style="width: 3rem;")
-                                        img(src="/data/icons/pause.png" alt="" width="100%")
-                                    .req_vol_bar
+                                    audio(controls src=`/api/v1/file/${req.mediaFile.audioKey}`)
                             
                             .request_btns
                                 button#tocancel Отклонить

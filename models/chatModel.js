@@ -9,6 +9,10 @@ const chatSchema = new mongoose.Schema(
         user2: {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
+        },
+        status: {
+            type: String,
+            enum: ['updated', 'still']
         }
     },
     {

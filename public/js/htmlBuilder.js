@@ -3,6 +3,21 @@ import { loadMusic, playMusic, togglePlay, setProgressBar, setSoundBar, checkPla
 let currentUser;
 let currentCover, currentPlayingTrack, currentAuthor, currentTrackId;
 
+function formatDate(mongoDate) {
+  // Проверяем, является ли значение числом (timestamp) или объектом Date
+  const date = typeof mongoDate === 'number' 
+    ? new Date(mongoDate) 
+    : mongoDate instanceof Date 
+      ? mongoDate 
+      : new Date();
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}.${month}.${year}`;
+}
+
 const updateAlbumsList = async function(artistId) {
     try {
         const res = await axios({
@@ -76,6 +91,31 @@ const loadMainPage = async function() {
             `);
         }
 
+        const randomTracks = await axios({
+            method: 'GET',
+            url: '/api/v1/mediafiles/getRandomTracks'
+        });
+
+        for (let i = 0; i < randomTracks.data.length; i++) {
+            await $(".recommend_audio_box").append(`
+                <div class="music_box track" data-index="1" id="${randomTracks.data[i]._id}" data-authorname="${randomTracks.data[i].authorInfo.name}" data-trackname="${randomTracks.data[i].name}" data-cover="${randomTracks.data[i].coverKey}" data-key="${randomTracks.data[i].audioKey}">
+                    <div class="music_box_inner">
+                        <div class="music_image_holder">
+                        <img src="/api/v1/file/${randomTracks.data[i].coverKey}" alt="">
+                        </div>
+                        <div class="music_info">
+                        <p class="music_name">${randomTracks.data[i].name}</p>
+                        <p class="music_author">${randomTracks.data[i].authorInfo.name}</p>
+                        </div>
+                    </div>
+                    <div class="music_box_inner">
+                        <img class="add_music_icon" src="./data/icons/more.png" alt="">
+                    </div>
+                </div>
+            `);
+        }
+
+
         mainPageHandlers();
         topMenuHandlers();
         audioFileHandlers();
@@ -135,7 +175,7 @@ const audioHostingHandlers = function () {
                                 </div>
                                 <div>
                                     <p class="statTrackName">${mediafiles[i].name}</p>
-                                    <p class="statTrackUploadDate">${mediafiles[i].date}</p>
+                                    <p class="statTrackUploadDate">${formatDate(mediafiles[i].date)}</p>
                                 </div>
                             </div>
                             <div class="statInformation">
@@ -434,6 +474,25 @@ const authorPageHandlers = async function() {
         reader.readAsDataURL(file);
     });
 
+    $(".openMyChannel").click(async function() {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/messenger'
+            });
+
+            if (res.status === 200) {
+                await $('.visibleParts').empty().append(res.data);
+
+                messengerPageHandlers(null, currentUser.channel);
+                audioFileHandlers();
+            }
+        } catch (err) {
+            alert("something went wrong");
+            console.log(err);
+        }
+    });
+
     audioFileHandlers();
 };
 
@@ -507,10 +566,6 @@ const printPlaylistTracks = async (tracks) => {
 
                         <div style="display: flex; align-items: center; gap: 2.4rem;">
                             <p style="font-size: 1.4rem; color: #ccc;">${tracks[i].artist.name}</p>
-                            <img src="./data/icons/share.png" alt="" width="20rem" class="shareTrack">
-                            <img src="./data/icons/more.png" alt="" width="20rem" class="likeTrack">
-                            <img class="threeDotsPlaylist" src="./data/icons/threedots.png" alt="" width="20rem">
-                            <p style="font-size: 1.4rem; color: #ccc;">2:53</p>
                         </div>
 
                     </div>
@@ -550,21 +605,8 @@ const artistPageHandlers = async artist => {
             await printPlaylistTracks(res1.data.data);
         }
 
-        let myPlaylists = await axios({
-            method: 'GET',
-            url: `/api/v1/playlists/${currentUser._id}`
-        });
-
-        myPlaylists = myPlaylists.data.data;
-
-        for (let i = 0; i < myPlaylists.length; i++)
-        {
-            await $("#wadehell").append(
-                `
-                    <div class="not_item playlist_item" id="${myPlaylists[i]._id}"><p class="not_status">${myPlaylists[i].name}</p></div>
-                `
-            );
-        }
+        await updateAlbumsList(artist);
+        albumsHandlers();
 
     } catch (err) {
         alert("Something went wrongelo tartalelo");
@@ -704,7 +746,10 @@ const mainPageHandlers = function() {
                     try {
                         const channelReq = await axios({
                             method: 'POST',
-                            url: '/api/v1/channels'
+                            url: '/api/v1/channels',
+                            data: {
+                                name
+                            }
                         });
 
                         if (channelReq.status === 201) {
@@ -776,6 +821,9 @@ const mainPageHandlers = function() {
                     }
                 }
             } catch (err) {
+                if (err.status === 403) {
+                    alert("Ваш аккаунт заблокирован! 😥");
+                }
                 console.log(err);
             }
         }
@@ -978,6 +1026,25 @@ const mainPageHandlers = function() {
             });
         }
     });
+
+    $(".messenger_button").click(async function() {
+        try {
+            const res = await axios({
+                method: 'GET',
+                url: '/api/v1/html/messenger'
+            });
+
+            if (res.status === 200) {
+                await $('.visibleParts').empty().append(res.data);
+
+                messengerPageHandlers();
+                audioFileHandlers();
+            }
+        } catch (err) {
+            alert("something went wrong");
+            console.log(err);
+        }
+    });
 };
 
 const topMenuHandlers = (req, res) => {
@@ -1001,21 +1068,16 @@ const topMenuHandlers = (req, res) => {
             console.log(err);
         }
     });
+
     $("#mainPageLink").off('click').click(async function() {
         $(".underline").fadeOut(100, function() {$(this).remove()});
         $(this).append('<div class="underline"></div>');
 
         await loadMainPage();
-        topMenuHandlers();
     });
 };
 
 $(document).ready(async function() {
-    audioHostingHandlers();
-    topMenuHandlers();
-    mainPageHandlers();
-    audioFileHandlers();
-
     try {
         const res = await axios({
             method: 'GET',
@@ -1032,6 +1094,28 @@ $(document).ready(async function() {
                     <p class="hosting_menu_text">Артист Ну Артист</p>
                 </div>    
             `);
+
+            await $(".management_menu").append(`
+                <div class="management_menu">
+                    <div class="management_title_box">
+                        <div class="title_box">
+                        <img src="/data/icons/profile.png" alt="" style="width: 2.5rem;">
+                        <p class="management_menu_title">Управление</p>
+                        </div>
+                        <img class="togo_management_icon" src="/data/icons/yellow_next.png" alt="">
+                    </div>
+                    
+                    <div class="stats_container">
+                        <div class="stats_holder" id="openStatistic">
+                        <img src="/data/icons/loading.png" alt="">
+                        <div class="stats_box">
+                            <p class="stat_title">Статистика</p>
+                            <p class="stat_info">Ваши треки и альбомы</p>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                `);
             
             $("#artistPageLink").click(async function() {
                 try {
@@ -1057,12 +1141,61 @@ $(document).ready(async function() {
             });
         }
 
+        const randomTracks = await axios({
+            method: 'GET',
+            url: '/api/v1/mediafiles/getRandomTracks'
+        });
+
+        for (let i = 0; i < randomTracks.data.length; i++) {
+            await $(".recommend_audio_box").append(`
+                <div class="music_box track" data-index="1" id="${randomTracks.data[i]._id}" data-authorname="${randomTracks.data[i].authorInfo.name}" data-trackname="${randomTracks.data[i].name}" data-cover="${randomTracks.data[i].coverKey}" data-key="${randomTracks.data[i].audioKey}">
+                    <div class="music_box_inner">
+                        <div class="music_image_holder">
+                        <img src="/api/v1/file/${randomTracks.data[i].coverKey}" alt="">
+                        </div>
+                        <div class="music_info">
+                        <p class="music_name">${randomTracks.data[i].name}</p>
+                        <p class="music_author">${randomTracks.data[i].authorInfo.name}</p>
+                        </div>
+                    </div>
+                    <div class="music_box_inner">
+                        <img class="add_music_icon" src="./data/icons/more.png" alt="">
+                    </div>
+                </div>
+            `);
+        }
+
+        loadMusic(randomTracks.data[0].audioKey, randomTracks.data[0].coverKey, randomTracks.data[0].authorInfo.name, randomTracks.data[0].name);
+
+        currentTrackId = randomTracks.data[0]._id;
+        currentAuthor = randomTracks.data[0].authorInfo.name;
+        currentPlayingTrack = randomTracks.data[0].name;
+        currentCover = randomTracks.data[0].coverKey;
+
     } catch (err)
     {
+        if (err.status === 403) {
+            alert("Ваш аккаунт был заблокирован");
+            try {
+                const res = await axios({
+                    method: 'GET',
+                    url: '/api/v1/users/logout'
+                });
+
+                if (res.status === 200) {
+                    window.location.reload();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
         console.log(err);
     }
 
-    
+    audioHostingHandlers();
+    topMenuHandlers();
+    mainPageHandlers();
+    audioFileHandlers();
 });
 
 
@@ -1094,33 +1227,52 @@ const audioFileHandlers = () => {
         }
     });
 
-    $(".threeDotsPlaylist").off('click').click(function () {
+    $(".threeDotsPlaylist").off('click').click(async function () {
         $("#playlistbox").show(200);
+        let myPlaylists = await axios({
+            method: 'GET',
+            url: `/api/v1/playlists/${currentUser._id}`
+        });
+
+        myPlaylists = myPlaylists.data.data;
+
+        await $("#wadehell").empty();
+        for (let i = 0; i < myPlaylists.length; i++)
+        {
+            await $("#wadehell").append(
+                `
+                    <div class="not_item playlist_item" id="${myPlaylists[i]._id}"><p class="not_status">${myPlaylists[i].name}</p></div>
+                `
+            );
+        }
+
+        $(".playlist_item").off('click').click(async function () {
+            try {
+                const res = await axios({
+                    method: 'PATCH',
+                    url: `/api/v1/playlists/addTrack/${this.id}`,
+                    data: {
+                        audioFileId: currentTrackId
+                    }
+                });
+
+                if (res.status === 200) {
+                    alert("Трек был добавлен в плейлист!");
+                    $("#playlistbox").hide(200);
+                }
+                
+            } catch (err) {
+                alert("Something went extremely wrong");
+            }
+        });
     });
 
-    $(".playlist_overlay").off('click').click(function() {
+    $(".playlist_overlay").off('click').click(function(el) {
+        if (this !== el.target)  return;
         $("#playlistbox").hide(200);
     });
 
-    $(".playlist_item").off('click').click(async function () {
-        try {
-            const res = await axios({
-                method: 'PATCH',
-                url: `/api/v1/playlists/addTrack/${this.id}`,
-                data: {
-                    audioFileId: currentTrackId
-                }
-            });
-
-            if (res.status === 200) {
-                alert("Трек был добавлен в плейлист!");
-                $("#playlistbox").hide(200);
-            }
-            
-        } catch (err) {
-            alert("Something went extremely wrong");
-        }
-    });
+    
 
     $(".shareTrack").off('click').click(async function() {
         if (!currentTrackId) return;
@@ -1187,22 +1339,20 @@ const audioFileHandlers = () => {
     });
 
     $(".track").off('click').click(async function(el) {
-        if ($(el.target.parentNode)["0"] == this) {
-            currentTrackId = this.id;
-            currentAuthor = this.dataset.authorname;
-            currentPlayingTrack = this.dataset.trackname;
-            currentCover = this.dataset.cover;
-            try {
-                const res = await axios({
-                    method: 'PATCH',
-                    url: `/api/v1/mediafiles/listen/${this.id}`
-                });
-            } catch (err) {
-                console.log(err);
-            }
-            await loadMusic(this.dataset.key, currentCover, currentAuthor, currentPlayingTrack);
-            playMusic();
+        currentTrackId = this.id;
+        currentAuthor = this.dataset.authorname;
+        currentPlayingTrack = this.dataset.trackname;
+        currentCover = this.dataset.cover;
+        try {
+            const res = await axios({
+                method: 'PATCH',
+                url: `/api/v1/mediafiles/listen/${this.id}`
+            });
+        } catch (err) {
+            console.log(err);
         }
+        await loadMusic(this.dataset.key, currentCover, currentAuthor, currentPlayingTrack);
+        playMusic();
     });
 };
 
@@ -1215,33 +1365,6 @@ const userPageHandlers = async function () {
     try {
         const res = await axios({
             method: 'GET',
-            url: '/api/v1/friendLinks/myFriends'
-        });
-
-        if (res.status === 200) {
-            const myFriends = res.data;
-
-
-            for (let i = 0; i < myFriends.length; i++) {
-                $("#myFriendsList").append(
-                    `
-                        <div class="author_holder">
-                            <div class="author_image_holder">
-                                <img src="/api/v1/file/${myFriends[i].photoKey}" alt="">
-                            </div>
-                        </div>
-                    `
-                )
-            }
-        }
-    } catch (err) {
-        alert("soemthing went wronghelo");
-        console.log(err);
-    }
-
-    try {
-        const res = await axios({
-            method: 'GET',
             url: `/api/v1/playlists/tracks/${currentUser.favourites}`
         });
 
@@ -1250,7 +1373,7 @@ const userPageHandlers = async function () {
             for (let i = 0; i < favTracks.length; i++) {
                 await $("#usersFavourites").append(
                     `
-                    <div class="music_box" data-index="4">
+                    <div class="music_box track" id="${favTracks[i]._id}" data-authorname="${favTracks[i].artist.name}" data-trackname="${favTracks[i].name}" data-cover="${favTracks[i].coverKey}" data-key="${favTracks[i].audioKey}">
                         <div class="music_box_inner">
                             <div class="music_image_holder">
                                 <img src="/api/v1/file/${favTracks[i].coverKey}" alt="">
@@ -1261,9 +1384,8 @@ const userPageHandlers = async function () {
                             </div>
                         </div>
     
-                        <div class="music_box_inner">
-                            <p class="music_duration">1:35</p>
-                            <img src="./data/icons/more.png" alt="" class="add_music_icon">
+                        <div class="putInCenter deleteTrackFromFavorites" style="width: 3rem; height: 3rem; cursor: pointer;" >
+                            <img src="./data/icons/delete.png" alt="" width="100%" data-image="yes">
                         </div>
                     </div>
                     `
@@ -1300,6 +1422,26 @@ const userPageHandlers = async function () {
             }
         }
     });
+
+    $(".deleteTrackFromFavorites").click(async function() {
+        try {
+            const res = await axios({
+                method: 'PATCH',
+                url: `/api/v1/playlists/${currentUser.favourites}`,
+                body: {
+                    trackId: this.parentNode.id
+                }
+            });
+
+            if (res.status === 200) {
+                $(this.parentNode).hide(200, function() {$(this).remove()});
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    audioFileHandlers();
 };
 
 const loadPlaylists = async () => {
@@ -1318,13 +1460,17 @@ const loadPlaylists = async () => {
                         <div class="widget_card playlistItem" id="${playlists[i]._id}">
                             <div class="black_fade">
                                 <p class="widget_card_name">${playlists[i].name}</p>
+                                <div class="putInCenter deletePlaylist" style="width: 3rem; height: 3rem; cursor: pointer;" >
+                                    <img src="./data/icons/delete.png" alt="" width="100%" data-image="yes">
+                                </div>
                             </div>
                         </div>
                     `
                 );
             }
 
-            $('.playlistItem').click(async function() {
+            $('.playlistItem').click(async function(el) {
+                if (el.target.dataset.image) return;
                 $(".authors_box").hide(200);
                 $(".recommendations_box").hide(200);
                 $(".widgets_box").hide(200);
@@ -1353,6 +1499,21 @@ const loadPlaylists = async () => {
                         await printPlaylistTracks(res.data);
                     }
 
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+
+            $(".deletePlaylist").click(async function() {
+                try {
+                    const res = await axios({
+                        method: 'DELETE',
+                        url: `/api/v1/playlists/${this.parentNode.parentNode.id}`
+                    });
+
+                    if (res.status === 203) {
+                        $(this.parentNode.parentNode).hide(200, function() {$(this).remove()});
+                    }
                 } catch (err) {
                     console.log(err);
                 }
@@ -1401,6 +1562,7 @@ const friendsPageHanlders = async function() {
 
         const currentValue = $("#friendInput").val();
         if (currentValue != "") {
+            await $(".friendsSearchHolder").empty();
             try {
                 const res = await axios({
                     method: 'GET',
@@ -1536,7 +1698,7 @@ const messengerPageHandlers = async function(userid, channelId) {
                         <img src="/api/v1/file/${currentUser.photoKey}" alt="">
                     </div>
                     <div style="width: 100%; padding-top: 1rem;">
-                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${currentUser.name}</p>
                         <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
                             <div class="ms_post_pic" id="postPicture">
                                 <img src="./data/default_pic.jpg" alt="" id="img_cover">
@@ -1546,7 +1708,7 @@ const messengerPageHandlers = async function(userid, channelId) {
                                 Заголовок
                             </p>
 
-                            <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5;" id="postContent">
+                            <p style="font-size: 1.4rem; padding: 1rem 2rem; font-weight: 400; line-height: 1.5; white-space: pre-line;" id="postContent">
                                 Основной текст
                             </p>
                         </div>
@@ -1661,7 +1823,7 @@ const messengerPageHandlers = async function(userid, channelId) {
                         <div class="ms_message_field channelItem" id="${channels[i]._id}">
                             <div style="display: flex; align-items: center; gap: 2rem;">
                                 <div class="ms_message_avatar">
-                                    <img src="./data/CRAZY.jpg" alt="">
+                                    <img src="./data/icons/connection.png" alt="">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
                                     <p class="ms_message_name">Когда нибудь будет</p>
@@ -1829,6 +1991,28 @@ const messengerPageHandlers = async function(userid, channelId) {
                         <p class="hosting_menu_text">Артист Ну Артист</p>
                     </div>    
                 `);
+
+                await $(".management_menu").append(`
+                <div class="management_menu">
+                    <div class="management_title_box">
+                        <div class="title_box">
+                        <img src="/data/icons/profile.png" alt="" style="width: 2.5rem;">
+                        <p class="management_menu_title">Управление</p>
+                        </div>
+                        <img class="togo_management_icon" src="/data/icons/yellow_next.png" alt="">
+                    </div>
+                    
+                    <div class="stats_container">
+                        <div class="stats_holder" id="openStatistic">
+                        <img src="/data/icons/loading.png" alt="">
+                        <div class="stats_box">
+                            <p class="stat_title">Статистика</p>
+                            <p class="stat_info">Ваши треки и альбомы</p>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                `);
                 
                 $("#artistPageLink").click(async function() {
                     try {
@@ -1853,7 +2037,7 @@ const messengerPageHandlers = async function(userid, channelId) {
                     }
                 });
             }
-            
+
             audioHostingHandlers();
 
             loadMainPage();
@@ -1877,13 +2061,17 @@ const updateCommentSection = async function(postId) {
             await actualComments.empty();
 
             for (let i = 0; i < comments.length; i++) {
+                if (comments[i].author.status === "blocked") continue;
                 await actualComments.append(`
-                        <div class="income_box">
+                        <div class="income_box" id="${comments[i]._id}">
+                            <div class="putInCenter createBlockRequest" style="width: 3rem; height: 3rem; cursor: pointer;" >
+                                <img src="./data/icons/exclamation.png" alt="" width="100%">
+                            </div>
                             <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
                                 <img src="/api/v1/file/${comments[i].author.photoKey}" alt="">
                             </div>
                             <div style="width: 40%; padding-top: 1rem;">
-                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${comments[i].author.name} - <span>8:40</span></p>
+                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${comments[i].author.name}</p>
                                 <div class="ms_message_box" style="border-top-left-radius: 0;">
                                     <p class="ms_message_content">${comments[i].content}</p>
                                 </div>
@@ -1891,6 +2079,24 @@ const updateCommentSection = async function(postId) {
                         </div>
                     `);
             }
+
+            $(".createBlockRequest").click(async function() {
+                try {
+                    const res = await axios({
+                        method: 'POST',
+                        url: `/api/v1/blockRequests`,
+                        data: {
+                            commentId: this.parentNode.id
+                        }
+                    });
+
+                    if (res.status === 201) {
+                        alert('Заявка была создана');
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            });
         }
     } catch (err) {
         alert("Чет не получилось коммента загрузить крч");
@@ -1922,10 +2128,10 @@ const printPosts = async function(posts) {
         await $("#messagesHolder").append(`
                 <div class="income_box">
                     <div class="ms_message_avatar" style="width: 5rem; height: 5rem;">
-                        <img src="./data/12dcd2799b4e5ead1b94fe052ab30568.jpg" alt="">
+                        <img src="./data/icons/connection.png" alt="">
                     </div>
                     <div style="width: 100%; padding-top: 1rem;">
-                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">godtearz - <span>8:40</span></p>
+                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;"></p>
                         <div class="ms_message_box ms_post" style="border-top-left-radius: 0; padding: 2rem 0 0 0 ;">
                             <div class="ms_post_pic">
                                 <img src="/api/v1/file/${posts[i].photoKey}" alt="">
@@ -1940,7 +2146,7 @@ const printPosts = async function(posts) {
                             </p>
 
                             <div class="comment_btn" id="${posts[i]._id}">
-                                <p><span>231</span> комментариев ---></p>
+                                <p>Смотреть комментарии ---></p>
                             </div>
 
                         </div>
@@ -1957,6 +2163,8 @@ const printMessages = async function(chatid) {
             url: `/api/v1/chats/${chatid}`
         });
 
+        if (res.data.status === "still") return;
+
         if (res.status === 200) {
             const messages = res.data.messages.reverse();
             let otherUser;
@@ -1971,14 +2179,12 @@ const printMessages = async function(chatid) {
                     if (messages[i].type === "Mediafile") {
                         await $("#messagesHolder").append(
                             `
-                            <div class="outcome_box" style="justify-content: right;">
-                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                            <div class="outcome_box messenger_file" style="justify-content: right;" data-authorname="${messages[i].mediafile.artist.name}" data-cover="${messages[i].mediafile.coverKey}" data-key="${messages[i].mediafile.audioKey}" data-trackname="${messages[i].mediafile.name}" id="${messages[i].mediafile._id}">
+                                <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name}</p>
                                 <div class="ath_song_card" style="float: right; width: 40rem; height: 20rem; margin-top: 1rem;">
                                     <div class="ath_song_info">
                                         <div style="display: flex; align-items: center; gap: 1rem;">
-                                            <div class="ath_snippet_play_btn" style="background-color: rgb(222, 222, 222); flex-shrink: 0; width: 3rem; height: 3rem;">
-                                                <img src="./data/icons/pause.png" alt="">
-                                            </div>
+                                            
                                             <p style="font-size: 1.4rem; line-height: 1.3; width: 120%; flex-shrink: 0; z-index: 100;">${messages[i].mediafile.name}</p>
                                         </div>
                                         <div style="display: flex; align-items: center; gap: 1rem;">
@@ -2004,7 +2210,7 @@ const printMessages = async function(chatid) {
                             `
                                 <div class="outcome_box" style="justify-content: right;">
                                     <div style="width: 40%; padding-top: 1rem;">
-                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name} - <span>8:40</span></p>
+                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; text-align: right; color: #eee;">${currentUser.name}</p>
                                         <div class="ms_message_box outcome" style="float: right; border-top-right-radius: 0;">
                                             <p class="ms_message_content">${messages[i].content}</p>
                                         </div>
@@ -2057,7 +2263,7 @@ const printMessages = async function(chatid) {
                                         <img src="/api/v1/file/${otherUser.photoKey}" alt="">
                                     </div>
                                     <div style="width: 40%; padding-top: 1rem;">
-                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${otherUser.name} - <span>8:40</span></p>
+                                        <p style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; color: #eee;">${otherUser.name}</p>
                                         <div class="ms_message_box" style="border-top-left-radius: 0;">
                                             <p class="ms_message_content">${messages[i].content}</p>
                                         </div>
@@ -2069,12 +2275,33 @@ const printMessages = async function(chatid) {
                 }
             }
             
+            $(".messenger_file").click(async function() {
+                currentTrackId = this.id;
+                currentAuthor = this.dataset.authorname;
+                currentPlayingTrack = this.dataset.trackname;
+                currentCover = this.dataset.cover;
+
+                try {
+                    const res = await axios({
+                        method: 'PATCH',
+                        url: `/api/v1/mediafiles/listen/${this.id}`
+                    });
+                } catch (err) {
+                    console.log(err);
+                }
+                await loadMusic(this.dataset.key, currentCover, currentAuthor, currentPlayingTrack);
+                playMusic();
+            });
+
             const mh = document.querySelector("#messagesHolder");
             mh.scrollTo(0, mh.scrollHeight);
         }
     } catch (err) {
-        console.log("something went wrong");
-        clearInterval(updateChat);
+        console.log(err);
+        if (updateChat)
+        {
+            clearInterval(updateChat);
+        }
         console.log(err);
     }
 };

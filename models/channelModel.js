@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const channelSchema = new mongoose.Schema(
     {
-        followers: Number
+        followers: Number,
+        name: String
     },
     {
         toJSON: { virtuals: true },

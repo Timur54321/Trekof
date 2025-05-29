@@ -7,14 +7,18 @@ block content
     main
         section.moderator_section
             .mod_left_bar
-                .mod_window
+                .mod_window#loadReports
                     div(style="width: 7rem;")
                         img(src="./data/icons/report.png" alt="" width="100%")
                     p Жалобы
-                .mod_window
+                .mod_window#systemStats
                     div(style="width: 7rem;")
                         img(src="./data/icons/music-file.png" alt="" width="100%")
-                    p Заявки
+                    p Статистика 
+                .mod_window#loadModeration
+                    div(style="width: 7rem;")
+                        img(src="./data/icons/music-file.png" alt="" width="100%")
+                    p Модерация 
             .mod_right_bar
                 p.mod_title(style="margin-bottom: 2rem;") Cтатистика системы
                 .userStatItemBox
@@ -51,4 +55,4 @@ block content
                         p(style="font-size: 6.4rem; color: black;")= trackCount
 
 block scripts 
-    script(src='/js/moderator.js')
+    script(src='/js/admin.js')

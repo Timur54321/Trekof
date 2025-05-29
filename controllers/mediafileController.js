@@ -77,4 +77,19 @@ exports.updateListens = async (req, res) => {
     );
 
     res.status(200).json('success');
+};
+
+exports.getRandomTracks = async (req, res) => {
+    const tracks = await MediaFile.aggregate([
+    { $sample: { size: 4 } },
+    { $lookup: {
+        from: 'users',
+        localField: 'artist',
+        foreignField: '_id',
+        as: 'authorInfo'
+    }},
+    { $unwind: '$authorInfo' }
+  ]);
+
+    res.status(200).json(tracks);
 }

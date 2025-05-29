@@ -47,6 +47,10 @@ exports.getChat = async (req, res) => {
         ]
     });
 
+    if (chat.status === "updated") {
+        const updatedChat = await Chat.findByIdAndUpdate(chat._id, {status: 'still'});
+    }
+
     res.status(200).json(chat);
 };
 

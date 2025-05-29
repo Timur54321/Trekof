@@ -10,8 +10,8 @@ exports.createOne = async (req, res) => {
     });
 };
 
-exports.getRequests = async (req, ers) => {
-    const requests = await Request.find();
+exports.getRequests = async (req, res) => {
+    const requests = await Request.find({status: "На рассмотрении"}).populate('mediaFile');
 
     res.status(200).json({
         status: 'success',
